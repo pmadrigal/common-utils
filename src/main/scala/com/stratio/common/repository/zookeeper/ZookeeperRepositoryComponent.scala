@@ -16,7 +16,6 @@
 
 package com.stratio.common.repository.zookeeper
 
-import akka.event.slf4j.SLF4JLogging
 import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.cache.{NodeCache, NodeCacheListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
@@ -31,9 +30,10 @@ import scala.util.{Failure, Success, Try}
 import com.stratio.common.config.ConfigComponent
 import com.stratio.common.repository.RepositoryComponent
 import com.stratio.common.repository.zookeeper.ZookeeperConstants._
+import com.stratio.common.logger.LoggerComponent
 
-trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byte]] with SLF4JLogging {
-  self: ConfigComponent =>
+trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byte]] {
+  self: ConfigComponent with LoggerComponent =>
 
   val repository = new ZookeeperRepository{}
 
