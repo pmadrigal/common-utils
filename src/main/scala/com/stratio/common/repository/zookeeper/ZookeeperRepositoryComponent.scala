@@ -106,10 +106,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         curatorClient.start()
       ).isSuccess
 
-    def stop: Boolean =
-      Try(
-        CloseableUtils.closeQuietly(curatorClient)
-      ).isSuccess
+    def stop: Boolean = ZookeeperRepository.clean
 
     def getState: RepositoryState =
       curatorClient.getState match {
@@ -137,17 +134,16 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
     }
   }
 
-  object ZookeeperRepository {
+  private[this] object ZookeeperRepository {
 
     private var curatorClientOpt: Option[CuratorFramework] = None
 
-    def getInstance(config: Config): CuratorFramework = {
-
+    def getInstance(config: Config): CuratorFramework = synchronized {
       curatorClientOpt.getOrElse {
         Try {
           CuratorFrameworkFactory.builder()
             .connectString(
-              config.getString(ZookeeperConnection,DefaultZookeeperConnection)
+              config.getString(ZookeeperConnection, DefaultZookeeperConnection)
             )
             .connectionTimeoutMs(
               config.getInt(ZookeeperConnectionTimeout, DefaultZookeeperConnectionTimeout)
@@ -172,15 +168,11 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
       }
     }
 
-    def clean: Boolean = {
-      if(curatorClientOpt.isDefined)
-        Try {
-          CloseableUtils.closeQuietly(curatorClientOpt.get)
-          curatorClientOpt = None
-        }.isSuccess
-      else
-        true
-    }
+    def clean: Boolean =
+      Try {
+        CloseableUtils.closeQuietly(curatorClientOpt.get)
+        curatorClientOpt = None
+      }.isSuccess
   }
 }
 

@@ -24,7 +24,7 @@ trait RepositoryComponent[K, V] {
 
   trait Repository {
 
-    trait RepositoryState
+    sealed trait RepositoryState
     case object Started extends RepositoryState
     case object Stopped extends RepositoryState
     case object NotStarted extends RepositoryState
