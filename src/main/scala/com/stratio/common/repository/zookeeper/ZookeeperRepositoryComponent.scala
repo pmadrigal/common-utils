@@ -51,7 +51,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         )
       }
 
-    def getSubRepository(id: String): Try[List[String]] =
+    def getChildren(id: String): Try[List[String]] =
       Try {
         curatorClient
           .getChildren

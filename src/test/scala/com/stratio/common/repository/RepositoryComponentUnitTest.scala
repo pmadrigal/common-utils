@@ -97,11 +97,11 @@ class RepositoryComponentUnitTest extends WordSpec
     "get a subrepository" should {
 
       "return a list with the keys of the sub repository if the operation is successful" in new DummyRepositoryContext {
-        repository.getSubRepository(keyNotFound) should be(Try(List.empty[String]))
+        repository.getChildren("key3") should be(Try(List("key31")))
       }
 
       "return and empty list if the operation is not successful" in new DummyRepositoryContext {
-        repository.getSubRepository(keyNotFound) should be(Try(List.empty[String]))
+        repository.getChildren(keyNotFound) should be(Try(List.empty[String]))
       }
     }
   }
