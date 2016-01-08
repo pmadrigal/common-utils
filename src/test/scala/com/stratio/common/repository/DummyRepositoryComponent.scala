@@ -33,7 +33,7 @@ trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
     def get(id: String): Try[Option[String]] =
       Try(memoryMap.get(id).map(_.toString))
 
-    def getSubRepository(id: String): Try[List[String]] =
+    def getChildren(id: String): Try[List[String]] =
       Try(memoryMap.get(id)).map {
         case Some(map: Map[String, Any] @unchecked) => map.keys.toList
         case _ => List.empty[String]

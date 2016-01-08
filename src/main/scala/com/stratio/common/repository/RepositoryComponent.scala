@@ -32,7 +32,7 @@ trait RepositoryComponent[K, V] {
 
     def get(id: K): Try[Option[V]]
 
-    def getSubRepository(id: K): Try[List[K]]
+    def getChildren(id: K): Try[List[K]]
 
     def exists(id: K): Try[Boolean]
     
