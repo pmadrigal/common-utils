@@ -28,6 +28,6 @@ object ZookeeperConstants {
   val DefaultZookeeperRetryAttemps = 5
   val ZookeeperRetryInterval = "retryInterval"
   val DefaultZookeeperRetryInterval = 10000
-  val ConfigZookeeper = "zk"
+  val ConfigZookeeper = "zookeeper"
 
 }

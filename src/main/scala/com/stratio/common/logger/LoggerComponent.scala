@@ -18,7 +18,7 @@ package com.stratio.common.logger
 
 trait LoggerComponent {
 
-  val log: Logger
+  val logger: Logger
 
   trait Logger {
 

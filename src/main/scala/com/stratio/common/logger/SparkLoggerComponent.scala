@@ -16,13 +16,13 @@
 
 package com.stratio.common.logger
 
-import org.slf4j.LoggerFactory
+import org.apache.spark.Logging
 
-trait Slf4jLoggerComponent extends LoggerComponent {
+trait SparkLoggerComponent extends LoggerComponent with Logging {
 
-  val logger: Logger = new Slf4jLogger(LoggerFactory.getLogger(getClass.getName))
+  val logger: Logger = new SparkLogger(log)
 
-  class Slf4jLogger(logger: org.slf4j.Logger) extends Logger {
+  class SparkLogger(logger: org.slf4j.Logger) extends Logger {
 
     def name: String = logger.getName
 
