@@ -16,8 +16,6 @@
 
 package com.stratio.common.repository
 
-import scala.util.{Failure, Success, Try}
-
 trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
 
   val repository: Repository = new DummyRepository()
@@ -30,46 +28,37 @@ trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
 
   class DummyRepository() extends Repository {
 
-    def get(id: String): Try[Option[String]] =
-      Try(memoryMap.get(id).map(_.toString))
+    def get(id: String): Option[String] =
+      memoryMap.get(id).map(_.toString)
 
-    def getChildren(id: String): Try[List[String]] =
-      Try(memoryMap.get(id)).map {
-        case Some(map: Map[String, Any] @unchecked) => map.keys.toList
+    def getChildren(id: String): List[String] =
+      memoryMap.get(id) match {
+        case Some(map: Map[String, Any]@unchecked) => map.keys.toList
         case _ => List.empty[String]
       }
 
-    def exists(id: String): Try[Boolean] =
-      Try(memoryMap.contains(id))
-    
-    def create(id: String, element: String): Try[Boolean] = Try {
-      if(exists(id) == Success(false)) {
+    def exists(id: String): Boolean =
+      memoryMap.contains(id)
+
+    def create(id: String, element: String): String = {
+      if (!exists(id)) {
         memoryMap = memoryMap + (id -> element)
-        true
-      } else false
+      }
+      element
     }
 
-    def update(id: String, element: String): Try[Boolean] = Try {
-      if(exists(id) == Success(true)) {
-        memoryMap = memoryMap + (id -> element)
-        true
-      } else false
-    }
+    def update(id: String, element: String): Unit =
+      if (exists(id)) memoryMap = memoryMap + (id -> element)
 
-    def delete(id: String): Try[Boolean] = Try {
-      if(exists(id) == Success(true)) {
-        memoryMap = memoryMap - id
-        true
-      } else false
-    }
+    def delete(id: String): Unit =
+      if (exists(id)) memoryMap = memoryMap - id
 
     def getConfig: Map[String, Any] = memoryMap
 
     def start: Boolean = true
 
     def stop: Boolean = false
-    
-    def getState: RepositoryState = Started
 
+    def getState: RepositoryState = Started
   }
 }

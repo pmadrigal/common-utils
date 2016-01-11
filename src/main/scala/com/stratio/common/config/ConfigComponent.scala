@@ -42,7 +42,5 @@ trait ConfigComponent {
     }
 
     def toMap: Map[String, Any]
-    
   }
-
 }
