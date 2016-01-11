@@ -16,27 +16,81 @@
 
 package com.stratio.common.config
 
-import com.typesafe.config.{ ConfigFactory,  Config => TypesafeConfiguration }
+import java.io.File
 
-import scala.util.Try
+import com.typesafe.config.{Config => TypesafeConfiguration, ConfigFactory}
+
 import scala.collection.JavaConversions._
+import scala.util.Try
 
 trait TypesafeConfigComponent extends ConfigComponent {
 
   val config: Config = new TypesafeConfig()
 
-  class TypesafeConfig(subPath: Option[String] = None) extends Config {
+  class TypesafeConfig(typeSafeConfig: Option[TypesafeConfiguration] = None,
+                       file: Option[File] = None,
+                       resource: Option[String] = None,
+                       subPath: Option[String] = None) extends Config {
 
     val conf: TypesafeConfiguration =
       subPath.fold(
-        ConfigFactory.load()
-      ){path =>
-        ConfigFactory.load.getConfig(path)
+        resource.fold(
+          file.fold(typeSafeConfig.getOrElse(ConfigFactory.load())) { externalFile =>
+            val fileConfig = ConfigFactory.parseFile(externalFile)
+            typeSafeConfig.fold(fileConfig) { tConfig =>
+              tConfig.withFallback(fileConfig)
+            }
+          }) { typeSafeResource =>
+          ConfigFactory.load(typeSafeResource)
+        }
+      ) { path =>
+        resource.fold(
+          file.fold(typeSafeConfig.getOrElse(ConfigFactory.load())) { externalFile =>
+            val fileConfig = ConfigFactory.parseFile(externalFile)
+            typeSafeConfig.fold(fileConfig) { tConfig =>
+              tConfig.withFallback(fileConfig)
+            }.getConfig(path)
+          }) { typeSafeResource =>
+          typeSafeConfig.fold(ConfigFactory.load(typeSafeResource)) { tConfig =>
+            tConfig.withFallback(ConfigFactory.load(typeSafeResource))
+          }.getConfig(path)
+        }
       }
 
-    def getConfig(key: String): Option[Config] =
+    def mergeConfig(typeSafeConfig: TypesafeConfiguration): Config =
+      new TypesafeConfig(Option(conf.withFallback(typeSafeConfig)))
+
+    def getSubConfig(subConfigKey: String): Option[Config] =
       Try {
-        new TypesafeConfig(Option(key))
+        new TypesafeConfig(Option(conf.getConfig(subConfigKey)))
+      }.toOption
+
+    def getConfig(typeSafeConfig: TypesafeConfiguration,
+                  file: Option[File] = None,
+                  resource: Option[String] = None,
+                  subPath: Option[String] = None): Option[Config] =
+      Try {
+        new TypesafeConfig(Option(typeSafeConfig), file, resource, subPath)
+      }.toOption
+
+    def getConfig(resource: String, subPath: String): Option[Config] =
+      Try {
+        new TypesafeConfig(None, None, Option(resource), Option(subPath))
+      }.toOption
+
+    def getConfig(resource: String): Option[Config] =
+      Try {
+        new TypesafeConfig(None, None, Option(resource), None)
+      }.toOption
+
+    def getConfig(file: File): Option[Config] =
+      Try {
+        new TypesafeConfig(None, Option(file))
+      }.toOption
+
+    def getConfig(file: File, subPath: String): Option[Config] =
+      Try {
+        new TypesafeConfig(None, Option(file), Option(subPath))
       }.toOption
 
     def getString(key: String): Option[String] =
@@ -55,6 +109,6 @@ trait TypesafeConfigComponent extends ConfigComponent {
       }.getOrElse(List.empty[String])
 
     def toMap: Map[String, Any] = conf.root().toMap
-
   }
+
 }

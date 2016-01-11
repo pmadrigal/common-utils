@@ -126,7 +126,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
           override def nodeChanged(): Unit =
             Try(new String(nodeCache.getCurrentData.getData)) match {
               case Success(value) => callback(read[T](value), nodeCache)
-              case Failure(e) => log.error(s"NodeCache value: ${nodeCache.getCurrentData}", e)
+              case Failure(e) => logger.error(s"NodeCache value: ${nodeCache.getCurrentData}", e)
             }
         }
       )

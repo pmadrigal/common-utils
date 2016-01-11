@@ -18,7 +18,7 @@ package com.stratio.common.logger
 
 trait DummyLoggerComponent extends LoggerComponent {
 
-  val log: Logger = new DummyLogger{}
+  val logger: Logger = new DummyLogger{}
 
   trait DummyLogger extends Logger {
 

@@ -28,7 +28,7 @@
     </parent>
 
     <artifactId>common</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <url>http://www.stratio.com</url>
@@ -57,8 +57,9 @@
         <scalatest.version>2.2.2</scalatest.version>
         <junit.version>4.11</junit.version>
         <akka.version>2.3.4-spark</akka.version>
-        <json4s.version>3.2.10</json4s.version>
+        <json4s.version>3.2.11</json4s.version>
         <curator.version>2.9.0</curator.version>
+        <spark.version>1.5.2</spark.version>
     </properties>
 
     <dependencies>
@@ -91,6 +92,12 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
