@@ -27,11 +27,10 @@
         <version>0.5.0</version>
     </parent>
 
+    <groupId>com.stratio.common</groupId>
     <artifactId>common-utils</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
-    <url>http://www.stratio.com</url>
+    <version>0.2.0-SNAPSHOT</version>
+    <packaging>jar</packaging>    
 
     <name>Stratio Common Utils</name>
     <description>Common library with generic implementations for common functions</description>
