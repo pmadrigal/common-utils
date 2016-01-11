@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.common.config
+package com.stratio.common.utils.config
 
 trait ConfigComponent {
 

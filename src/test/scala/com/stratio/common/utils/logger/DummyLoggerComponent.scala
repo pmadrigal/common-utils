@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.stratio.common.logger
+package com.stratio.common.utils.logger
+
+import com.stratio.common.utils.logger.LoggerComponent
 
 trait DummyLoggerComponent extends LoggerComponent {
 

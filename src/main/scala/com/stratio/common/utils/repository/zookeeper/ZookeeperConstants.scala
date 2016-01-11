@@ -14,36 +14,20 @@
  * limitations under the License.
  */
 
-package com.stratio.common.logger
+package com.stratio.common.utils.repository.zookeeper
 
-trait LoggerComponent {
+object ZookeeperConstants {
 
-  val logger: Logger
+  val ZookeeperConnection = "connectionString"
+  val DefaultZookeeperConnection = "localhost:2181"
+  val ZookeeperConnectionTimeout = "connectionTimeout"
+  val DefaultZookeeperConnectionTimeout = 15000
+  val ZookeeperSessionTimeout = "sessionTimeout"
+  val DefaultZookeeperSessionTimeout = 60000
+  val ZookeeperRetryAttemps = "retryAttempts"
+  val DefaultZookeeperRetryAttemps = 5
+  val ZookeeperRetryInterval = "retryInterval"
+  val DefaultZookeeperRetryInterval = 10000
+  val ConfigZookeeper = "zookeeper"
 
-  trait Logger {
-
-    def name: String
-
-    def debug(msg: String): Unit
-
-    def error(msg: String): Unit
-
-    def error(msg: String, ex: Throwable): Unit
-
-    def info(msg: String): Unit
-
-    def warn(msg: String): Unit
-
-    def trace(msg: String): Unit
-
-    def isDebugEnabled: Boolean
-
-    def isErrorEnabled: Boolean
-
-    def isInfoEnabled: Boolean
-
-    def isWarnEnabled: Boolean
-
-    def isTraceEnabled: Boolean
-  }
 }

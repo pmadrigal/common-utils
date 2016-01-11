@@ -14,14 +14,14 @@
   * limitations under the License.
   */
 
-package com.stratio.common.repository.zookeeper
+package com.stratio.common.utils.repository.zookeeper
 
 import java.util.NoSuchElementException
 
-import com.stratio.common.config.ConfigComponent
-import com.stratio.common.logger.LoggerComponent
-import com.stratio.common.repository.RepositoryComponent
-import com.stratio.common.repository.zookeeper.ZookeeperConstants._
+import com.stratio.common.utils.repository.zookeeper.ZookeeperConstants._
+import com.stratio.common.utils.config.ConfigComponent
+import com.stratio.common.utils.logger.LoggerComponent
+import com.stratio.common.utils.repository.RepositoryComponent
 import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.cache.{NodeCache, NodeCacheListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}

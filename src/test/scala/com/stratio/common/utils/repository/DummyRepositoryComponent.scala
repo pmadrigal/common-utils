@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.stratio.common.repository
+package com.stratio.common.utils.repository
+
+import com.stratio.common.utils.repository.RepositoryComponent
 
 trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
 
