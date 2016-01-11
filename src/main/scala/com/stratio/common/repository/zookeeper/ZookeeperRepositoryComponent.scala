@@ -1,21 +1,27 @@
 /**
- * Copyright (C) 2015 Stratio (http://stratio.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+  * Copyright (C) 2015 Stratio (http://stratio.com)
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 
 package com.stratio.common.repository.zookeeper
 
+import java.util.NoSuchElementException
+
+import com.stratio.common.config.ConfigComponent
+import com.stratio.common.logger.LoggerComponent
+import com.stratio.common.repository.RepositoryComponent
+import com.stratio.common.repository.zookeeper.ZookeeperConstants._
 import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.cache.{NodeCache, NodeCacheListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
@@ -27,13 +33,10 @@ import org.json4s.jackson.Serialization.read
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
 
-import com.stratio.common.config.ConfigComponent
-import com.stratio.common.repository.RepositoryComponent
-import com.stratio.common.repository.zookeeper.ZookeeperConstants._
-import com.stratio.common.logger.LoggerComponent
-
 trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byte]] {
   self: ConfigComponent with LoggerComponent =>
+
+  val curatorFramework: CuratorFramework
 
   val repository = new ZookeeperRepository{}
 
@@ -42,57 +45,47 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
     private def curatorClient: CuratorFramework =
       ZookeeperRepository.getInstance(getZookeeperConfig)
 
-    def get(id: String): Try[Option[Array[Byte]]] =
-      Try {
-        Option(
-          curatorClient
-            .getData
-            .forPath(id)
-        )
-      }
-
-    def getChildren(id: String): Try[List[String]] =
-      Try {
+    def get(id: String): Option[Array[Byte]] =
+      Option(
         curatorClient
-          .getChildren
-          .forPath(id).toList
-      }
-
-    def exists(id: String): Try[Boolean] =
-      Try {
-        Option(curatorClient
-          .checkExists()
+          .getData
           .forPath(id)
-        ).isDefined
-      }
-    
-    def create(id: String, element: Array[Byte]): Try[Boolean] =
-      Try {
-        Option(
-          curatorClient
-            .create()
-            .creatingParentsIfNeeded()
-            .forPath(id, element)
-        ).isDefined
-      }
+      )
 
-    def update(id: String, element: Array[Byte]): Try[Boolean] =
-      Try {
-        Option(
-          curatorClient
-            .setData()
-            .forPath(id, element)
-        ).isDefined
-      }
+    def getChildren(id: String): List[String] =
+      curatorClient
+        .getChildren
+        .forPath(id).toList
 
-    def delete(id: String): Try[Boolean] =
-      Try {
-        Option(
-          curatorClient
-            .delete()
-            .forPath(id)
-        ).isDefined
-      }
+
+
+    def exists(id: String): Boolean =
+      Option(curatorClient
+        .checkExists()
+        .forPath(id)
+      ).isDefined
+
+    def create(id: String, element: Array[Byte]): Array[Byte] = {
+      curatorClient
+        .create()
+        .creatingParentsIfNeeded()
+        .forPath(id, element)
+
+      get(id)
+        .orElse(throw new NoSuchElementException(s"Something were wrong when retrieving element $id after create"))
+        .get
+    }
+
+    def update(id: String, element: Array[Byte]): Unit =
+      curatorClient
+        .setData()
+        .forPath(id, element)
+
+
+    def delete(id: String): Unit =
+      curatorClient
+        .delete()
+        .forPath(id)
 
     def getZookeeperConfig: Config =
       config.getConfig(ConfigZookeeper)
@@ -117,7 +110,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
       }
 
     def addListener[T <: Serializable](id: String, callback: (T, NodeCache) => Unit)
-      (implicit jsonFormat: Formats, ev: Manifest[T]): Unit = {
+                                      (implicit jsonFormat: Formats, ev: Manifest[T]): Unit = {
 
       val nodeCache: NodeCache = new NodeCache(curatorClient, id)
 

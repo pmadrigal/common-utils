@@ -16,8 +16,6 @@
 
 package com.stratio.common.repository
 
-import scala.util.Try
-
 trait RepositoryComponent[K, V] {
 
   val repository: Repository
@@ -30,17 +28,17 @@ trait RepositoryComponent[K, V] {
     case object NotStarted extends RepositoryState
     case object Unknown extends RepositoryState
 
-    def get(id: K): Try[Option[V]]
+    def get(id: K): Option[V]
 
-    def getChildren(id: K): Try[List[K]]
+    def getChildren(id: K): List[K]
 
-    def exists(id: K): Try[Boolean]
+    def exists(id: K): Boolean
     
-    def create(id: K, element: V): Try[Boolean]
+    def create(id: K, element: V): V
 
-    def update(id: K, element: V): Try[Boolean]
+    def update(id: K, element: V): Unit
 
-    def delete(id: K): Try[Boolean]
+    def delete(id: K): Unit
 
     def getConfig: Map[String, Any]
 
