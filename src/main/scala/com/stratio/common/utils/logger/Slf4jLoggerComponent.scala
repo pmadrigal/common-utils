@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.common.logger
+package com.stratio.common.utils.logger
 
 import org.slf4j.LoggerFactory
 

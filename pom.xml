@@ -27,27 +27,15 @@
         <version>0.5.0</version>
     </parent>
 
-    <artifactId>common</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <artifactId>common-utils</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <url>http://www.stratio.com</url>
 
-    <name>Stratio Common</name>
-    <description>Common library</description>
+    <name>Stratio Common Utils</name>
+    <description>Common library with generic implementations for common functions</description>
     <inceptionYear>2015</inceptionYear>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
-
-    <organization>
-        <name>Stratio</name>
-        <url>http://stratio.com</url>
-    </organization>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -120,7 +108,6 @@
     </dependencies>
 
     <build>
-        <finalName>stratio-common</finalName>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -140,38 +127,5 @@
           </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>build</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <configuration>
-                                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-                                    <repositoryId>sonatype-nexus-staging</repositoryId>
-                                    <pomFile>pom.xml</pomFile>
-                                    <files>
-                                        <file>target/stratio-common-${project.version}.jar</file>
-                                        <file>target/stratio-common-${project.version}-javadoc.jar</file>
-                                        <file>target/stratio-common-${project.version}-sources.jar</file>
-                                    </files>
-                                </configuration>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>

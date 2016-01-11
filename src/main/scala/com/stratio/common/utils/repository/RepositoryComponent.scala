@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.common.repository
+package com.stratio.common.utils.repository
 
 trait RepositoryComponent[K, V] {
 

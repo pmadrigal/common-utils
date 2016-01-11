@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package com.stratio.common.repository.zookeeper
+package com.stratio.common.utils.repository.zookeeper
 
 case class ZookeeperRepositoryException(msg: String) extends Exception(msg)
