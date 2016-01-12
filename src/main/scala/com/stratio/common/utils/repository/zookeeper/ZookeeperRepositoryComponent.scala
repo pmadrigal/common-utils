@@ -36,8 +36,6 @@ import scala.util.{Failure, Success, Try}
 trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byte]] {
   self: ConfigComponent with LoggerComponent =>
 
-  val curatorFramework: CuratorFramework
-
   val repository = new ZookeeperRepository{}
 
   trait ZookeeperRepository extends Repository {
