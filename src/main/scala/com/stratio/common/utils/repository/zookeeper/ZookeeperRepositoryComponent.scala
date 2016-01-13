@@ -132,7 +132,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
     def getInstance(config: Config): CuratorFramework = synchronized {
       curatorClientOpt.getOrElse {
         Try {
-          CuratorFrameworkFactory.builder()
+          val curatorFramework = CuratorFrameworkFactory.builder()
             .connectString(
               config.getString(ZookeeperConnection, DefaultZookeeperConnection)
             )
@@ -147,8 +147,9 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
                 config.getInt(ZookeeperRetryInterval, DefaultZookeeperRetryInterval),
                 config.getInt(ZookeeperRetryAttemps, DefaultZookeeperRetryAttemps)
               )
-            )
-            .build()
+            ).build()
+          curatorFramework.start()
+          curatorFramework
         } match {
           case Success(client: CuratorFramework) =>
             curatorClientOpt = Option(client)
