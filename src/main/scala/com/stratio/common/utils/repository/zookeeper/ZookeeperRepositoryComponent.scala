@@ -17,12 +17,11 @@
 package com.stratio.common.utils.repository.zookeeper
 
 import java.util.NoSuchElementException
+import java.util.concurrent.ConcurrentHashMap
 
-import com.stratio.common.utils.repository.zookeeper.ZookeeperConstants._
 import com.stratio.common.utils.config.ConfigComponent
 import com.stratio.common.utils.logger.LoggerComponent
 import com.stratio.common.utils.repository.RepositoryComponent
-import org.apache.curator.framework.imps.CuratorFrameworkState
 import org.apache.curator.framework.recipes.cache.{NodeCache, NodeCacheListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
@@ -33,57 +32,62 @@ import org.json4s.jackson.Serialization.read
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
 
+import com.stratio.common.utils.repository.zookeeper.ZookeeperConstants._
+
 trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byte]] {
   self: ConfigComponent with LoggerComponent =>
 
-  val repository = new ZookeeperRepository{}
+  val repository = new ZookeeperRepository {}
 
   trait ZookeeperRepository extends Repository {
 
     private def curatorClient: CuratorFramework =
       ZookeeperRepository.getInstance(getZookeeperConfig)
 
-    def get(id: String): Option[Array[Byte]] =
+    def get(entity: String, id: String): Option[Array[Byte]] =
       Option(
         curatorClient
           .getData
-          .forPath(id)
+          .forPath(s"/$entity/$id")
       )
 
-    def getChildren(id: String): List[String] =
+    def getAll(entity: String): List[Array[Byte]] =
       curatorClient
         .getChildren
-        .forPath(id).toList
+        .forPath(s"/$entity").map(get(entity, _).get).toList
 
+    def count(entity: String): Long =
+      curatorClient
+        .getChildren
+        .forPath(s"/$entity").size.toLong
 
-
-    def exists(id: String): Boolean =
+    def exists(entity: String, id: String): Boolean =
       Option(curatorClient
         .checkExists()
-        .forPath(id)
+        .forPath(s"/$entity/$id")
       ).isDefined
 
-    def create(id: String, element: Array[Byte]): Array[Byte] = {
+    def create(entity: String, id: String, element: Array[Byte]): Array[Byte] = {
       curatorClient
         .create()
         .creatingParentsIfNeeded()
-        .forPath(id, element)
+        .forPath(s"/$entity/$id", element)
 
-      get(id)
+      get(entity, id)
         .orElse(throw new NoSuchElementException(s"Something were wrong when retrieving element $id after create"))
         .get
     }
 
-    def update(id: String, element: Array[Byte]): Unit =
+    def update(entity: String, id: String, element: Array[Byte]): Unit =
       curatorClient
         .setData()
-        .forPath(id, element)
+        .forPath(s"/$entity/$id", element)
 
 
-    def delete(id: String): Unit =
+    def delete(entity: String, id: String): Unit =
       curatorClient
         .delete()
-        .forPath(id)
+        .forPath(s"/$entity/$id")
 
     def getZookeeperConfig: Config =
       config.getConfig(ConfigZookeeper)
@@ -97,15 +101,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         curatorClient.start()
       ).isSuccess
 
-    def stop: Boolean = ZookeeperRepository.clean
-
-    def getState: RepositoryState =
-      curatorClient.getState match {
-        case CuratorFrameworkState.STARTED => Started
-        case CuratorFrameworkState.STOPPED => Stopped
-        case CuratorFrameworkState.LATENT => NotStarted
-        case _ => Unknown
-      }
+    def stop: Boolean = ZookeeperRepository.stop(config)
 
     def addListener[T <: Serializable](id: String, callback: (T, NodeCache) => Unit)
                                       (implicit jsonFormat: Formats, ev: Manifest[T]): Unit = {
@@ -127,44 +123,51 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
 
   private[this] object ZookeeperRepository {
 
-    private var curatorClientOpt: Option[CuratorFramework] = None
-
     def getInstance(config: Config): CuratorFramework = synchronized {
-      curatorClientOpt.getOrElse {
+      val connectionString = config.getString(ZookeeperConnection, DefaultZookeeperConnection)
+      CuratorFactoryMap.curatorFrameworks.getOrElse(connectionString, {
         Try {
-          val curatorFramework = CuratorFrameworkFactory.builder()
-            .connectString(
-              config.getString(ZookeeperConnection, DefaultZookeeperConnection)
-            )
-            .connectionTimeoutMs(
-              config.getInt(ZookeeperConnectionTimeout, DefaultZookeeperConnectionTimeout)
-            )
-            .sessionTimeoutMs(
-              config.getInt(ZookeeperSessionTimeout, DefaultZookeeperSessionTimeout)
-            )
+          CuratorFrameworkFactory.builder()
+            .connectString(connectionString)
+            .connectionTimeoutMs(config.getInt(ZookeeperConnectionTimeout, DefaultZookeeperConnectionTimeout))
+            .sessionTimeoutMs(config.getInt(ZookeeperSessionTimeout, DefaultZookeeperSessionTimeout))
             .retryPolicy(
               new ExponentialBackoffRetry(
                 config.getInt(ZookeeperRetryInterval, DefaultZookeeperRetryInterval),
-                config.getInt(ZookeeperRetryAttemps, DefaultZookeeperRetryAttemps)
-              )
-            ).build()
-          curatorFramework.start()
-          curatorFramework
+                config.getInt(ZookeeperRetryAttemps, DefaultZookeeperRetryAttemps)))
+            .build()
         } match {
           case Success(client: CuratorFramework) =>
-            curatorClientOpt = Option(client)
+            client.start
+            CuratorFactoryMap.curatorFrameworks.putIfAbsent(connectionString, client)
             client
           case Failure(_: Throwable) =>
             throw ZookeeperRepositoryException("Error trying to create a new Zookeeper instance")
         }
-      }
+      })
     }
 
-    def clean: Boolean =
-      Try {
-        CloseableUtils.closeQuietly(curatorClientOpt.get)
-        curatorClientOpt = None
-      }.isSuccess
+    def stopAll: Boolean =
+      synchronized {
+        Try {
+          CuratorFactoryMap.curatorFrameworks.foreach { case (key, curator) => CloseableUtils.closeQuietly(curator) }
+        }.isSuccess
+      }
+
+    def stop(config: Config): Boolean = {
+      synchronized {
+        val connectionString = config.getString(ZookeeperConnection, DefaultZookeeperConnection)
+        Try {
+          CloseableUtils.closeQuietly(CuratorFactoryMap.curatorFrameworks.get(connectionString).get)
+        }.isSuccess
+      }
+    }
   }
+
 }
 
+private[this] object CuratorFactoryMap {
+
+  val curatorFrameworks: scala.collection.concurrent.Map[String, CuratorFramework] =
+    new ConcurrentHashMap[String, CuratorFramework]()
+}
