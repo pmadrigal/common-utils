@@ -85,7 +85,7 @@ trait DummyDAOComponent extends DAOComponent[String, Array[Byte], Dummy]
     def fromMtoV(m: Dummy): Array[Byte] = m.property.getBytes
 
     //scalastyle:off
-    def entity= "dummy"
+    def entity = "dummy"
     //scalastyle:on
   }
 }

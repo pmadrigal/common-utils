@@ -76,6 +76,11 @@ trait TypesafeConfigComponent extends ConfigComponent {
         new TypesafeConfig(None, None, Option(resource), None)
       }.toOption
 
+    override def getConfigPath(path: String): Option[Config] =
+      Try {
+        new TypesafeConfig(None, None, None, Option(path))
+      }.toOption
+
     def getConfig(file: File): Option[Config] =
       Try {
         new TypesafeConfig(None, Option(file))
