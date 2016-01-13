@@ -16,8 +16,7 @@
 
 package com.stratio.common.utils.logger
 
-import com.stratio.common.utils.logger.LoggerComponent
-
+//scalastyle:off
 trait DummyLoggerComponent extends LoggerComponent {
 
   val logger: Logger = new DummyLogger{}
@@ -49,3 +48,4 @@ trait DummyLoggerComponent extends LoggerComponent {
     def isTraceEnabled: Boolean = true
   }
 }
+//scalastyle:on

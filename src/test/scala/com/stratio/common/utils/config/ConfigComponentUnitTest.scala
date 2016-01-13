@@ -138,7 +138,9 @@ class ConfigComponentUnitTest extends WordSpec
     "generate a Map of properties" should {
 
       "return a map with the properties" in {
+        //scalastyle:off
         config.toMap.size should be(5)
+        //scalastyle:on
       }
 
     }

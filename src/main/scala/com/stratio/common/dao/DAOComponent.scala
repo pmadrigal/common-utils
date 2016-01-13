@@ -1,0 +1,55 @@
+/**
+  * Copyright (C) 2015 Stratio (http://stratio.com)
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+
+package com.stratio.common.dao
+
+import com.stratio.common.utils.repository.RepositoryComponent
+
+trait DAOComponent[K, V, M] {
+
+  self: RepositoryComponent[K, V] =>
+
+  val dao: DAO
+
+  trait DAO {
+    def get(id: K): Option[M] =
+      repository.get(entity, id) map fromVtoM
+
+    def getAll(): List[M] =
+      repository.getAll(entity).map(fromVtoM(_))
+
+    def count(): Long =
+      repository.count(entity)
+
+    def exists(id: K): Boolean =
+      repository.exists(entity, id)
+
+    def create(id: K, element: M): M =
+      fromVtoM(repository.create(entity, id, fromMtoV(element)))
+
+    def update(id: K, element: M): Unit =
+      repository.update(entity, id, fromMtoV(element))
+
+    def delete(id: K): Unit =
+      repository.delete(entity, id)
+
+    def entity: String
+
+    def fromVtoM(v: V): M
+
+    def fromMtoV(m: M): V
+  }
+}

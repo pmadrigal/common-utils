@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package com.stratio.common.utils.repository
+package com.stratio.common.dao
 
-trait RepositoryComponent[K, V] {
+import com.stratio.common.utils.repository.DummyRepositoryComponent
 
-  val repository: Repository
+trait DummyDAOComponent extends DAOComponent[String, String, Model] with DummyRepositoryComponent {
 
-  trait Repository {
+  val dao: DAO = new DummyDAO {}
 
-    def get(entity: String, id: K): Option[V]
+  trait DummyDAO extends DAO {
 
-    def getAll(entity: String): List[V]
+    def fromVtoM(v: String): Model = Model(v)
 
-    def count(entity: String): Long
+    def fromMtoV(m: Model): String = m.property
 
-    def exists(entity: String, id: K): Boolean
-    
-    def create(entity: String, id: K, element: V): V
-
-    def update(entity: String, id: K, element: V): Unit
-
-    def delete(entity: String, id: K): Unit
+    //scalastyle:off
+    def entity= "dummy"
+    //scalastyle:on
   }
 }
+
+case class Model(property: String)
