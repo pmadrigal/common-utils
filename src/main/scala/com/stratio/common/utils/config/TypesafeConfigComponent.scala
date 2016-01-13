@@ -32,30 +32,23 @@ trait TypesafeConfigComponent extends ConfigComponent {
                        resource: Option[String] = None,
                        subPath: Option[String] = None) extends Config {
 
-    val conf: TypesafeConfiguration =
+    val conf: TypesafeConfiguration = {
+      val res = file.fold(typeSafeConfig.getOrElse(ConfigFactory.load())) { externalFile =>
+        val fileConfig = ConfigFactory.parseFile(externalFile)
+        typeSafeConfig.fold(fileConfig)(_.withFallback(fileConfig))
+      }
+
       subPath.fold(
-        resource.fold(
-          file.fold(typeSafeConfig.getOrElse(ConfigFactory.load())) { externalFile =>
-            val fileConfig = ConfigFactory.parseFile(externalFile)
-            typeSafeConfig.fold(fileConfig) { tConfig =>
-              tConfig.withFallback(fileConfig)
-            }
-          }) { typeSafeResource =>
-          ConfigFactory.load(typeSafeResource)
-        }
-      ) { path =>
-        resource.fold(
-          file.fold(typeSafeConfig.getOrElse(ConfigFactory.load())) { externalFile =>
-            val fileConfig = ConfigFactory.parseFile(externalFile)
-            typeSafeConfig.fold(fileConfig) { tConfig =>
-              tConfig.withFallback(fileConfig)
-            }.getConfig(path)
-          }) { typeSafeResource =>
+        resource.fold(res)(ConfigFactory.load)
+      ) { path => {
+        resource.fold(res) { typeSafeResource =>
           typeSafeConfig.fold(ConfigFactory.load(typeSafeResource)) { tConfig =>
             tConfig.withFallback(ConfigFactory.load(typeSafeResource))
-          }.getConfig(path)
+          }
         }
+      }.getConfig(path)
       }
+    }
 
     def mergeConfig(typeSafeConfig: TypesafeConfiguration): Config =
       new TypesafeConfig(Option(conf.withFallback(typeSafeConfig)))
