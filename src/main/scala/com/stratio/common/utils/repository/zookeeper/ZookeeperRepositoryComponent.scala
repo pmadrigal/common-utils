@@ -90,7 +90,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .forPath(s"/$entity/$id")
 
     def getZookeeperConfig: Config =
-      config.getConfig(ConfigZookeeper)
+      config.getConfigPath(ConfigZookeeper)
         .getOrElse(throw new ZookeeperRepositoryException("Zookeeper config not found"))
 
     def getConfig: Map[String, Any] =

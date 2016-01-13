@@ -24,6 +24,8 @@ trait ConfigComponent {
 
     def getConfig(key: String): Option[Config]
 
+    def getConfigPath(key: String): Option[Config] = None
+
     def getString(key: String): Option[String]
 
     def getString(key: String, default: String): String =
