@@ -14,9 +14,8 @@
   * limitations under the License.
   */
 
-package com.stratio.common.repository
+package com.stratio.common.utils.components.repository
 
-import com.stratio.common.utils.repository.DummyRepositoryComponent
 import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner

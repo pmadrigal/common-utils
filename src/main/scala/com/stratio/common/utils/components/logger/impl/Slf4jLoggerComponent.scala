@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.stratio.common.utils.logger
+package com.stratio.common.utils.components.logger.impl
 
-import org.apache.spark.Logging
+import com.stratio.common.utils.components.logger.LoggerComponent
+import org.slf4j.LoggerFactory
 
-trait SparkLoggerComponent extends LoggerComponent with Logging {
+trait Slf4jLoggerComponent extends LoggerComponent {
 
-  val logger: Logger = new SparkLogger(log)
+  val logger: Logger = new Slf4jLogger(LoggerFactory.getLogger(getClass.getName))
 
-  class SparkLogger(logger: org.slf4j.Logger) extends Logger {
+  class Slf4jLogger(logger: org.slf4j.Logger) extends Logger {
 
     def name: String = logger.getName
 

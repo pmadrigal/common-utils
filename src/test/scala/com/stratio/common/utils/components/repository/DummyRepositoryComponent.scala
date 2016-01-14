@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.common.utils.repository
+package com.stratio.common.utils.components.repository
 
 import scala.collection.mutable
 

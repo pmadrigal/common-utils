@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.stratio.common.utils.config
+package com.stratio.common.utils.components.config
 
 import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner
 
+import scala.util.Try
+
 @RunWith(classOf[JUnitRunner])
-class ConfigComponentUnitTest extends WordSpec
+class ConfigComponentTest extends WordSpec
   with Matchers
   with DummyConfigComponent {
 
@@ -145,5 +147,54 @@ class ConfigComponentUnitTest extends WordSpec
       }
 
     }
+  }
+}
+
+trait DummyConfigComponent extends ConfigComponent {
+
+  val memoryMap: Map[String, Any] = Map(
+    "stringProperty" -> "valueA",
+    "listProperty" -> "[valueB1,valueB2]",
+    "mapProperty" -> Map("propC1" -> "valueC1"),
+    "intProperty" -> "2",
+    "nullProperty" -> None.orNull
+  )
+
+  val config: Config = new DummyConfig()
+
+  class DummyConfig(subPath: Option[String] = None) extends Config {
+
+    val conf: Map[String, Any] =
+      subPath match {
+        case Some(key) =>
+          memoryMap.get(key) match {
+            case Some(map: Map[String, Any]@unchecked) => map
+            case _ => throw new Exception(s"Path $subPath not found.")
+          }
+        case None => memoryMap
+      }
+
+    def getConfig(key: String): Option[Config] =
+      Try {
+        new DummyConfig(Option(key))
+      }.toOption
+
+    def getString(key: String): Option[String] =
+      conf.get(key).flatMap(v => Try(v.toString).toOption)
+
+    def getInt(key: String): Option[Int] =
+      conf.get(key).flatMap(v => Try(v.toString.toInt).toOption)
+
+    private val listRegex = """\[(.*)\]""".r
+
+    def getStringList(key: String): List[String] =
+      getString(key).fold {
+        List.empty[String]
+      } {
+        case listRegex(listValues) => listValues.split(",").toList
+        case v => List.empty[String]
+      }
+
+    def toMap: Map[String, Any] = conf
   }
 }

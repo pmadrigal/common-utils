@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stratio.common.utils.config
+package com.stratio.common.utils.components.config
 
 trait ConfigComponent {
 
@@ -23,6 +23,8 @@ trait ConfigComponent {
   trait Config {
 
     def getConfig(key: String): Option[Config]
+
+    def getConfigPath(key: String): Option[Config] = None
 
     def getString(key: String): Option[String]
 

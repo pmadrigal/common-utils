@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.stratio.common.utils.config
+package com.stratio.common.utils.components.config.impl
 
 import java.io.File
 
+import com.stratio.common.utils.components.config.ConfigComponent
 import com.typesafe.config.{Config => TypesafeConfiguration, ConfigFactory}
 
 import scala.collection.JavaConversions._
