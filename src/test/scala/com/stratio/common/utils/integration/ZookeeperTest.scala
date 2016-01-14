@@ -14,12 +14,12 @@
   * limitations under the License.
   */
 
-package com.stratio.common.integration
+package com.stratio.common.utils.integration
 
-import com.stratio.common.dao.DAOComponent
-import com.stratio.common.utils.config.TypesafeConfigComponent
-import com.stratio.common.utils.logger.Slf4jLoggerComponent
-import com.stratio.common.utils.repository.zookeeper.ZookeeperRepositoryComponent
+import com.stratio.common.utils.components.config.impl.TypesafeConfigComponent
+import com.stratio.common.utils.components.dao.DAOComponent
+import com.stratio.common.utils.components.logger.impl.Slf4jLoggerComponent
+import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent
 import org.apache.curator.test.TestingServer
 import org.apache.curator.utils.CloseableUtils
 import org.junit.runner.RunWith
@@ -70,7 +70,6 @@ class ZookeeperIntegrationTest extends WordSpec
       dao.exists("test1") should be(false)
     }
   }
-
 }
 
 trait DummyDAOComponent extends DAOComponent[String, Array[Byte], Dummy]

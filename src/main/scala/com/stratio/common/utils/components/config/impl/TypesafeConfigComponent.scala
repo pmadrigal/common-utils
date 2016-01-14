@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.stratio.common.utils.config
+package com.stratio.common.utils.components.config.impl
 
 import java.io.File
 
+import com.stratio.common.utils.components.config.ConfigComponent
 import com.typesafe.config.{Config => TypesafeConfiguration, ConfigFactory}
 
 import scala.collection.JavaConversions._
@@ -50,36 +51,22 @@ trait TypesafeConfigComponent extends ConfigComponent {
       }
     }
 
-    def mergeConfig(typeSafeConfig: TypesafeConfiguration): Config =
-      new TypesafeConfig(Option(conf.withFallback(typeSafeConfig)))
-
-    def getSubConfig(subConfigKey: String): Option[Config] =
-      Try {
-        new TypesafeConfig(Option(conf.getConfig(subConfigKey)))
-      }.toOption
-
     def getConfig(typeSafeConfig: TypesafeConfiguration,
-                  file: Option[File] = None,
                   resource: Option[String] = None,
+                  file: Option[File] = None,
                   subPath: Option[String] = None): Option[Config] =
       Try {
         new TypesafeConfig(Option(typeSafeConfig), file, resource, subPath)
       }.toOption
 
-    def getConfig(resource: String, subPath: String): Option[Config] =
+    /**
+     * Generic method override from ConfigComponent
+     */
+    def getConfig(subPath: String): Option[Config] =
       Try {
-        new TypesafeConfig(None, None, Option(resource), Option(subPath))
+        new TypesafeConfig(Option(conf), None, None, Option(subPath))
       }.toOption
 
-    def getConfig(resource: String): Option[Config] =
-      Try {
-        new TypesafeConfig(None, None, Option(resource), None)
-      }.toOption
-
-    override def getConfigPath(path: String): Option[Config] =
-      Try {
-        new TypesafeConfig(None, None, None, Option(path))
-      }.toOption
 
     def getConfig(file: File): Option[Config] =
       Try {
@@ -89,6 +76,19 @@ trait TypesafeConfigComponent extends ConfigComponent {
     def getConfig(file: File, subPath: String): Option[Config] =
       Try {
         new TypesafeConfig(None, Option(file), Option(subPath))
+      }.toOption
+
+    def mergeConfig(typeSafeConfig: TypesafeConfiguration): Config =
+      new TypesafeConfig(Option(conf.withFallback(typeSafeConfig)))
+
+    def getSubConfig(subConfigKey: String): Option[Config] =
+      Try {
+        new TypesafeConfig(Option(conf.getConfig(subConfigKey)))
+      }.toOption
+
+    def getConfigResource(resource: String): Option[Config] =
+      Try {
+        new TypesafeConfig(None, None, Option(resource), None)
       }.toOption
 
     def getString(key: String): Option[String] =

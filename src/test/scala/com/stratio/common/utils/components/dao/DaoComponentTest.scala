@@ -1,6 +1,22 @@
+/**
+  * Copyright (C) 2015 Stratio (http://stratio.com)
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 
-package com.stratio.common.dao
+package com.stratio.common.utils.components.dao
 
+import com.stratio.common.utils.components.repository.DummyRepositoryComponent
 import org.scalatest.{Matchers, WordSpec}
 
 class DaoComponentTest extends WordSpec with Matchers {
@@ -11,7 +27,7 @@ class DaoComponentTest extends WordSpec with Matchers {
     "get a value" should {
 
       "return an option with the value if the value exists" in new DummyDAOComponentContext {
-        dao.get("key1") should be(Some(Model("value1")))
+        dao.get("key1") should be(Some(DummyModel("value1")))
         dao.count()
       }
       "return None if the value doesn't exist" in new DummyDAOComponentContext {
@@ -34,12 +50,12 @@ class DaoComponentTest extends WordSpec with Matchers {
 
       "return Model if the operation is successful" in new DummyDAOComponentContext {
         dao.get("keyNotFound") should be(None)
-        dao.create("keyNotFound", new Model("newValue")) should be(Model("newValue"))
-        dao.get("keyNotFound") should be(Some(Model("newValue")))
+        dao.create("keyNotFound", new DummyModel("newValue")) should be(DummyModel("newValue"))
+        dao.get("keyNotFound") should be(Some(DummyModel("newValue")))
       }
 
       "return false if the operation is not successful" in new DummyDAOComponentContext {
-        dao.create("key1", new Model("newValue")) should be(Model("newValue"))
+        dao.create("key1", new DummyModel("newValue")) should be(DummyModel("newValue"))
         dao.getAll()
       }
     }
@@ -47,7 +63,7 @@ class DaoComponentTest extends WordSpec with Matchers {
     "remove a value" should {
 
       "return true if the operation is successful" in new DummyDAOComponentContext {
-        dao.get("key1") should be(Some(Model("value1")))
+        dao.get("key1") should be(Some(DummyModel("value1")))
         dao.delete("key1")
         dao.get("key1") should be(None)
       }
@@ -61,13 +77,13 @@ class DaoComponentTest extends WordSpec with Matchers {
     "update a value" should {
 
       "return true if the operation is successful" in new DummyDAOComponentContext {
-        dao.get("key1") should be(Some(Model("value1")))
-        dao.update("key1", Model("newValue"))
-        dao.get("key1") should be(Some(Model("newValue")))
+        dao.get("key1") should be(Some(DummyModel("value1")))
+        dao.update("key1", DummyModel("newValue"))
+        dao.get("key1") should be(Some(DummyModel("newValue")))
       }
 
       "return false if the operation is not successful" in new DummyDAOComponentContext {
-        dao.update("keyNotFound", Model("newValue"))
+        dao.update("keyNotFound", DummyModel("newValue"))
         dao.getAll().size should be(3)
       }
     }
@@ -75,11 +91,26 @@ class DaoComponentTest extends WordSpec with Matchers {
     "getall" should {
 
       "return a list with all the data in the table" in new DummyDAOComponentContext {
-        dao.getAll() should be(List(Model("value1"), Model("value2"), Model("value3")))
+        dao.getAll() should be(List(DummyModel("value1"), DummyModel("value2"), DummyModel("value3")))
       }
     }
   }
 }
 
+trait DummyDAOComponent extends DAOComponent[String, String, DummyModel] with DummyRepositoryComponent {
 
+  val dao: DAO = new DummyDAO {}
 
+  trait DummyDAO extends DAO {
+
+    def fromVtoM(v: String): DummyModel = DummyModel(v)
+
+    def fromMtoV(m: DummyModel): String = m.property
+
+    //scalastyle:off
+    def entity= "dummy"
+    //scalastyle:on
+  }
+}
+
+case class DummyModel(property: String)

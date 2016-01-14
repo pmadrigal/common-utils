@@ -14,9 +14,9 @@
   * limitations under the License.
   */
 
-package com.stratio.common.dao
+package com.stratio.common.utils.components.dao
 
-import com.stratio.common.utils.repository.RepositoryComponent
+import com.stratio.common.utils.components.repository.RepositoryComponent
 
 trait DAOComponent[K, V, M] {
 

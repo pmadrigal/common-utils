@@ -14,14 +14,14 @@
   * limitations under the License.
   */
 
-package com.stratio.common.utils.repository.zookeeper
+package com.stratio.common.utils.components.repository.impl
 
 import java.util.NoSuchElementException
 import java.util.concurrent.ConcurrentHashMap
 
-import com.stratio.common.utils.config.ConfigComponent
-import com.stratio.common.utils.logger.LoggerComponent
-import com.stratio.common.utils.repository.RepositoryComponent
+import com.stratio.common.utils.components.config.ConfigComponent
+import com.stratio.common.utils.components.logger.LoggerComponent
+import com.stratio.common.utils.components.repository.RepositoryComponent
 import org.apache.curator.framework.recipes.cache.{NodeCache, NodeCacheListener}
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
@@ -31,15 +31,14 @@ import org.json4s.jackson.Serialization.read
 
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
-
-import com.stratio.common.utils.repository.zookeeper.ZookeeperConstants._
+import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent._
 
 trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byte]] {
   self: ConfigComponent with LoggerComponent =>
 
-  val repository = new ZookeeperRepository {}
+  val repository = new ZookeeperRepository()
 
-  trait ZookeeperRepository extends Repository {
+  class ZookeeperRepository(path: Option[String] = None) extends Repository {
 
     private def curatorClient: CuratorFramework =
       ZookeeperRepository.getInstance(getZookeeperConfig)
@@ -89,9 +88,10 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .delete()
         .forPath(s"/$entity/$id")
 
-    def getZookeeperConfig: Config =
-      config.getConfigPath(ConfigZookeeper)
+    def getZookeeperConfig: Config = {
+      config.getConfig(path.getOrElse(ConfigZookeeper))
         .getOrElse(throw new ZookeeperRepositoryException("Zookeeper config not found"))
+    }
 
     def getConfig: Map[String, Any] =
       getZookeeperConfig.toMap
@@ -171,3 +171,21 @@ private[this] object CuratorFactoryMap {
   val curatorFrameworks: scala.collection.concurrent.Map[String, CuratorFramework] =
     new ConcurrentHashMap[String, CuratorFramework]()
 }
+
+object ZookeeperRepositoryComponent {
+
+  val ZookeeperConnection = "connectionString"
+  val DefaultZookeeperConnection = "localhost:2181"
+  val ZookeeperConnectionTimeout = "connectionTimeout"
+  val DefaultZookeeperConnectionTimeout = 15000
+  val ZookeeperSessionTimeout = "sessionTimeout"
+  val DefaultZookeeperSessionTimeout = 60000
+  val ZookeeperRetryAttemps = "retryAttempts"
+  val DefaultZookeeperRetryAttemps = 5
+  val ZookeeperRetryInterval = "retryInterval"
+  val DefaultZookeeperRetryInterval = 10000
+  val ConfigZookeeper = "zookeeper"
+
+}
+
+case class ZookeeperRepositoryException(msg: String) extends Exception(msg)
