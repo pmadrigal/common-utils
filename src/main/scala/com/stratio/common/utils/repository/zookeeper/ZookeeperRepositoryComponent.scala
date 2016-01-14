@@ -37,9 +37,9 @@ import com.stratio.common.utils.repository.zookeeper.ZookeeperConstants._
 trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byte]] {
   self: ConfigComponent with LoggerComponent =>
 
-  val repository = new ZookeeperRepository {}
+  val repository = new ZookeeperRepository()
 
-  trait ZookeeperRepository extends Repository {
+  class ZookeeperRepository(path: Option[String] = None) extends Repository {
 
     private def curatorClient: CuratorFramework =
       ZookeeperRepository.getInstance(getZookeeperConfig)
@@ -89,9 +89,10 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .delete()
         .forPath(s"/$entity/$id")
 
-    def getZookeeperConfig: Config =
-      config.getConfigPath(ConfigZookeeper)
+    def getZookeeperConfig: Config = {
+      config.getConfig(path.getOrElse(ConfigZookeeper))
         .getOrElse(throw new ZookeeperRepositoryException("Zookeeper config not found"))
+    }
 
     def getConfig: Map[String, Any] =
       getZookeeperConfig.toMap
