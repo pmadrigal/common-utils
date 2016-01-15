@@ -16,10 +16,7 @@
 
 package com.stratio.common.utils.integration
 
-import com.stratio.common.utils.components.config.impl.TypesafeConfigComponent
-import com.stratio.common.utils.components.dao.DAOComponent
-import com.stratio.common.utils.components.logger.impl.Slf4jLoggerComponent
-import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent
+import com.stratio.common.utils.components.dao.GenericDAOComponent
 import org.apache.curator.test.TestingServer
 import org.apache.curator.utils.CloseableUtils
 import org.junit.runner.RunWith
@@ -72,21 +69,10 @@ class ZookeeperIntegrationTest extends WordSpec
   }
 }
 
-trait DummyDAOComponent extends DAOComponent[String, Array[Byte], Dummy]
-  with ZookeeperRepositoryComponent with TypesafeConfigComponent with Slf4jLoggerComponent {
 
-  val dao: DAO = new DummyDAO {}
+trait DummyDAOComponent extends GenericDAOComponent[Dummy] {
 
-  trait DummyDAO extends DAO {
-
-    def fromVtoM(v: Array[Byte]): Dummy = Dummy(new String(v))
-
-    def fromMtoV(m: Dummy): Array[Byte] = m.property.getBytes
-
-    //scalastyle:off
-    def entity = "dummy"
-    //scalastyle:on
-  }
+  override val dao : DAO = new GenericDAO(Option("dummy"))
 }
 
-case class Dummy(property: String)
+case class Dummy(property: String) {}

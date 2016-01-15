@@ -19,16 +19,16 @@ package com.stratio.common.utils.components.dao
 import com.stratio.common.utils.components.repository.RepositoryComponent
 
 trait DAOComponent[K, V, M] {
-
   self: RepositoryComponent[K, V] =>
 
   val dao: DAO
 
   trait DAO {
-    def get(id: K): Option[M] =
-      repository.get(entity, id) map fromVtoM
 
-    def getAll(): List[M] =
+    def get(id: K) (implicit manifest: Manifest[M]): Option[M] =
+      repository.get(entity, id).map(entity => fromVtoM(entity))
+
+    def getAll() (implicit manifest: Manifest[M]): List[M] =
       repository.getAll(entity).map(fromVtoM(_))
 
     def count(): Long =
@@ -37,10 +37,10 @@ trait DAOComponent[K, V, M] {
     def exists(id: K): Boolean =
       repository.exists(entity, id)
 
-    def create(id: K, element: M): M =
+    def create(id: K, element: M) (implicit manifest: Manifest[M]): M =
       fromVtoM(repository.create(entity, id, fromMtoV(element)))
 
-    def update(id: K, element: M): Unit =
+    def update(id: K, element: M) (implicit manifest: Manifest[M]): Unit =
       repository.update(entity, id, fromMtoV(element))
 
     def delete(id: K): Unit =
@@ -48,8 +48,7 @@ trait DAOComponent[K, V, M] {
 
     def entity: String
 
-    def fromVtoM(v: V): M
-
-    def fromMtoV(m: M): V
+    def fromVtoM(v: V)(implicit manifest: Manifest[M]): M
+    def fromMtoV(m: M)(implicit manifest: Manifest[M]): V
   }
 }

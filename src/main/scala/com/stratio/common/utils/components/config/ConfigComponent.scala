@@ -20,7 +20,8 @@ trait ConfigComponent {
 
   val config: Config
 
-  trait Config {
+  trait
+  Config {
 
     def getConfig(key: String): Option[Config]
 
