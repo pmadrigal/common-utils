@@ -17,11 +17,14 @@
 package com.stratio.common.utils.components.dao
 
 import com.stratio.common.utils.components.repository.DummyRepositoryComponent
+import org.json4s.DefaultFormats
 import org.scalatest.{Matchers, WordSpec}
 
 class DaoComponentTest extends WordSpec with Matchers {
 
-  trait DummyDAOComponentContext extends DummyDAOComponent
+  trait DummyDAOComponentContext extends DummyDAOComponent {
+    override val dao : DAO = new GenericDAO(Option("dummy"))
+  }
 
   "A dao component" when {
     "get a value" should {
@@ -50,7 +53,7 @@ class DaoComponentTest extends WordSpec with Matchers {
 
       "return Model if the operation is successful" in new DummyDAOComponentContext {
         dao.get("keyNotFound") should be(None)
-        dao.create("keyNotFound", new DummyModel("newValue")) should be(DummyModel("newValue"))
+        dao.create("keyNotFound", DummyModel("newValue")) should be(DummyModel("newValue"))
         dao.get("keyNotFound") should be(Some(DummyModel("newValue")))
       }
 
@@ -99,17 +102,20 @@ class DaoComponentTest extends WordSpec with Matchers {
 
 trait DummyDAOComponent extends DAOComponent[String, String, DummyModel] with DummyRepositoryComponent {
 
-  val dao: DAO = new DummyDAO {}
+  val dao: DAO = new GenericDAO()
 
-  trait DummyDAO extends DAO {
+  class GenericDAO(key: Option[String] = None) extends DAO {
 
-    def fromVtoM(v: String): DummyModel = DummyModel(v)
+    implicit val formats = DefaultFormats
 
-    def fromMtoV(m: DummyModel): String = m.property
+    def entity: String = {
+      if(key.isEmpty || key.get.trim.isEmpty) throw new IllegalStateException("EntityName in the DAO must be defined")
+      else key.get
+    }
 
-    //scalastyle:off
-    def entity= "dummy"
-    //scalastyle:on
+    override def fromVtoM(v: String)(implicit manifest: Manifest[DummyModel]): DummyModel = new DummyModel(v)
+
+    override def fromMtoV(m: DummyModel)(implicit manifest: Manifest[DummyModel]): String = m.property
   }
 }
 
