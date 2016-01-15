@@ -35,5 +35,7 @@ trait RepositoryComponent[K, V] {
     def update(entity: String, id: K, element: V): Unit
 
     def delete(entity: String, id: K): Unit
+
+    def deleteAll(entity: String): Unit
   }
 }

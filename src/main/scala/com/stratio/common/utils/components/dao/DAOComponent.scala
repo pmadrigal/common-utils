@@ -46,6 +46,9 @@ trait DAOComponent[K, V, M] {
     def delete(id: K): Unit =
       repository.delete(entity, id)
 
+    def deleteAll: Unit =
+      repository.deleteAll(entity)
+
     def entity: String
 
     def fromVtoM(v: V): M

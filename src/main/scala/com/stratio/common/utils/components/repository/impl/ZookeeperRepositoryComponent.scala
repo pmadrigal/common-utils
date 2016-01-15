@@ -88,6 +88,11 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .delete()
         .forPath(s"/$entity/$id")
 
+    def deleteAll(entity: String): Unit =
+      curatorClient
+        .delete()
+        .forPath(s"/$entity")
+
     def getZookeeperConfig: Config = {
       config.getConfig(path.getOrElse(ConfigZookeeper))
         .getOrElse(throw new ZookeeperRepositoryException("Zookeeper config not found"))
