@@ -56,9 +56,9 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .forPath(s"/$entity").map(get(entity, _).get).toList
 
     def count(entity: String): Long =
-      curatorClient
+      Try(curatorClient
         .getChildren
-        .forPath(s"/$entity").size.toLong
+        .forPath(s"/$entity").size.toLong).getOrElse(0L)
 
     def exists(entity: String, id: String): Boolean =
       Option(curatorClient
@@ -90,7 +90,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
 
     def deleteAll(entity: String): Unit =
       curatorClient
-        .delete()
+        .delete().deletingChildrenIfNeeded()
         .forPath(s"/$entity")
 
     def getZookeeperConfig: Config = {

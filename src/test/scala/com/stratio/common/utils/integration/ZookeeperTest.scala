@@ -69,6 +69,14 @@ class ZookeeperIntegrationTest extends WordSpec
       dao.delete("test1")
       dao.exists("test1") should be(false)
     }
+
+    "save a dummy in ZK and delete all" in  new DummyDAOComponent {
+      dao.create("test1", new Dummy("value"))
+      dao.get("test1") should be(Some(Dummy("value")))
+      dao.deleteAll
+      dao.exists("test1") should be(false)
+      dao.count() should be(0)
+    }
   }
 }
 

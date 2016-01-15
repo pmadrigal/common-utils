@@ -34,7 +34,7 @@ trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
   class DummyRepository() extends Repository {
 
     def get(entity:String, id: String): Option[String] =
-      memoryMap.get(entity).get.get(id)
+      memoryMap.get(entity).flatMap(_.get(id))
 
     def getAll(entity:String): List[String] =
       memoryMap.get(entity) match {
@@ -68,5 +68,7 @@ trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
 
     def delete(entity:String, id: String): Unit =
       if (exists(entity, id)) memoryMap.get(entity).get.remove(id)
+
+    def deleteAll(entity:String): Unit = memoryMap.remove(entity)
   }
 }

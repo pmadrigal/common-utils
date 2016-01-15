@@ -91,6 +91,20 @@ class RepositoryComponentTest extends WordSpec
       }
     }
 
+    "remove all values" should {
+
+      "check that the element does not exist when it has been removed all" in new DummyRepositoryContext {
+        repository.get(Entity, "key1") should be(Some("value1"))
+        repository.deleteAll(Entity)
+        repository.get(Entity, "key1") should be(None)
+      }
+
+      "do anything when a not existing element is removed all" in new DummyRepositoryContext {
+        repository.deleteAll(Entity)
+        repository.count(Entity) should be(0)
+      }
+    }
+
     "update a value" should {
 
       "check that the element has been updated with the new value" in new DummyRepositoryContext {
