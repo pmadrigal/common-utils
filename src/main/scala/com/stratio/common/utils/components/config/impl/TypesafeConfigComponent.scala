@@ -51,12 +51,28 @@ trait TypesafeConfigComponent extends ConfigComponent {
       }
     }
 
-    def getConfig(typeSafeConfig: TypesafeConfiguration,
-                  resource: Option[String] = None,
-                  file: Option[File] = None,
-                  subPath: Option[String] = None): Option[Config] =
+    def getConfigFromConfig(typeSafeConfig: TypesafeConfiguration, subPath: Option[String] = None): Option[Config] =
       Try {
         new TypesafeConfig(Option(typeSafeConfig), file, resource, subPath)
+      }.toOption
+
+    def getConfigFromFile(file: File, subPath: Option[String] = None): Option[Config] =
+      Try {
+        new TypesafeConfig(None, Option(file), None, subPath)
+      }.toOption
+
+    def getConfigFromResource(resource: String, subPath : Option[String] = None): Option[Config] =
+      Try {
+        new TypesafeConfig(None, None, Option(resource), subPath)
+      }.toOption
+
+
+    def getConfig(typeSafeConfig: Option[TypesafeConfiguration],
+                            resource: Option[String] = None,
+                            file: Option[File] = None,
+                            subPath: Option[String] = None): Option[Config] =
+      Try {
+        new TypesafeConfig(typeSafeConfig, file, resource, subPath)
       }.toOption
 
     /**
@@ -67,28 +83,12 @@ trait TypesafeConfigComponent extends ConfigComponent {
         new TypesafeConfig(Option(conf), None, None, Option(subPath))
       }.toOption
 
-
-    def getConfig(file: File): Option[Config] =
-      Try {
-        new TypesafeConfig(None, Option(file))
-      }.toOption
-
-    def getConfig(file: File, subPath: String): Option[Config] =
-      Try {
-        new TypesafeConfig(None, Option(file), Option(subPath))
-      }.toOption
-
     def mergeConfig(typeSafeConfig: TypesafeConfiguration): Config =
       new TypesafeConfig(Option(conf.withFallback(typeSafeConfig)))
 
     def getSubConfig(subConfigKey: String): Option[Config] =
       Try {
         new TypesafeConfig(Option(conf.getConfig(subConfigKey)))
-      }.toOption
-
-    def getConfigResource(resource: String): Option[Config] =
-      Try {
-        new TypesafeConfig(None, None, Option(resource), None)
       }.toOption
 
     def getString(key: String): Option[String] =
@@ -107,6 +107,9 @@ trait TypesafeConfigComponent extends ConfigComponent {
       }.getOrElse(List.empty[String])
 
     def toMap: Map[String, Any] = conf.root().toMap
+
+    def toStringMap: Map[String, String] =
+      conf.entrySet().map(entry => (entry.getKey, conf.getString(entry.getKey))).toMap[String, String]
   }
 
 }
