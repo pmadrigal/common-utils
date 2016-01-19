@@ -196,5 +196,7 @@ trait DummyConfigComponent extends ConfigComponent {
       }
 
     def toMap: Map[String, Any] = conf
+
+    def toStringMap: Map[String, String] = conf.map(entry => (entry._1, entry._2.toString))
   }
 }

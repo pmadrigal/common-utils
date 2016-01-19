@@ -45,5 +45,7 @@ trait ConfigComponent {
     }
 
     def toMap: Map[String, Any]
+
+    def toStringMap: Map[String, String]
   }
 }
