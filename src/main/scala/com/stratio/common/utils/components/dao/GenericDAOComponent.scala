@@ -36,7 +36,7 @@ with ZookeeperRepositoryComponent with TypesafeConfigComponent with SparkLoggerC
       else key.get
     }
 
-    override def fromVtoM(v: Array[Byte])(implicit manifest: Manifest[M]): M = read[M](new String(v))
-    override def fromMtoV(m: M)(implicit manifest: Manifest[M]): Array[Byte] = write(m).getBytes
+    override def fromVtoM[TM <: M : Manifest](v: Array[Byte]): TM = read[TM](new String(v))
+    override def fromMtoV[TM <: M : Manifest](m: TM): Array[Byte] = write(m).getBytes
   }
 }

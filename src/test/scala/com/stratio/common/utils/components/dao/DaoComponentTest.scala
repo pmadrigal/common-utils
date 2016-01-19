@@ -113,9 +113,9 @@ trait DummyDAOComponent extends DAOComponent[String, String, DummyModel] with Du
       else key.get
     }
 
-    override def fromVtoM(v: String)(implicit manifest: Manifest[DummyModel]): DummyModel = new DummyModel(v)
+    override def fromVtoM[TM >: DummyModel <: DummyModel : Manifest](v: String): TM = new DummyModel(v)
 
-    override def fromMtoV(m: DummyModel)(implicit manifest: Manifest[DummyModel]): String = m.property
+    override def fromMtoV[TM <: DummyModel : Manifest](m: TM): String = m.property
   }
 }
 
