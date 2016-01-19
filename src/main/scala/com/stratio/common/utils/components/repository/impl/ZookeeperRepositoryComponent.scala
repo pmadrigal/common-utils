@@ -44,16 +44,14 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
       ZookeeperRepository.getInstance(getZookeeperConfig)
 
     def get(entity: String, id: String): Option[Array[Byte]] =
-      Option(
-        curatorClient
+      Try(Option(curatorClient
           .getData
-          .forPath(s"/$entity/$id")
-      )
+          .forPath(s"/$entity/$id"))).getOrElse(None)
 
     def getAll(entity: String): List[Array[Byte]] =
-      curatorClient
+      Try(curatorClient
         .getChildren
-        .forPath(s"/$entity").map(get(entity, _).get).toList
+        .forPath(s"/$entity").map(get(entity, _).get).toList).getOrElse(List.empty[Array[Byte]])
 
     def count(entity: String): Long =
       Try(curatorClient
@@ -61,10 +59,10 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .forPath(s"/$entity").size.toLong).getOrElse(0L)
 
     def exists(entity: String, id: String): Boolean =
-      Option(curatorClient
+      Try(Option(curatorClient
         .checkExists()
-        .forPath(s"/$entity/$id")
-      ).isDefined
+        .forPath(s"/$entity/$id"))
+      ).getOrElse(None).isDefined
 
     def create(entity: String, id: String, element: Array[Byte]): Array[Byte] = {
       curatorClient
@@ -73,8 +71,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .forPath(s"/$entity/$id", element)
 
       get(entity, id)
-        .orElse(throw new NoSuchElementException(s"Something were wrong when retrieving element $id after create"))
-        .get
+        .getOrElse(throw new NoSuchElementException(s"Something were wrong when retrieving element $id after create"))
     }
 
     def update(entity: String, id: String, element: Array[Byte]): Unit =

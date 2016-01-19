@@ -16,7 +16,9 @@
 
 package com.stratio.common.utils.integration
 
+import com.stratio.common.utils.components.config.impl.TypesafeConfigComponent
 import com.stratio.common.utils.components.dao.GenericDAOComponent
+import com.stratio.common.utils.components.logger.impl.SparkLoggerComponent
 import org.apache.curator.test.TestingServer
 import org.apache.curator.utils.CloseableUtils
 import org.junit.runner.RunWith
@@ -78,7 +80,7 @@ class ZookeeperIntegrationTest extends WordSpec
 }
 
 
-trait DummyDAOComponent extends GenericDAOComponent[Dummy] {
+trait DummyDAOComponent extends GenericDAOComponent[Dummy] with TypesafeConfigComponent with SparkLoggerComponent {
 
   override val dao : DAO = new GenericDAO(Option("dummy"))
 }
