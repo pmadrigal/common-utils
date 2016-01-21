@@ -51,8 +51,8 @@ trait DAOComponent[K, V, M] {
 
     def entity: String
 
-    def fromVtoM(v: V)(implicit manifest: Manifest[M]): M
+    def fromVtoM[TM >: M <: M : Manifest](v: V): TM
 
-    def fromMtoV(m: M)(implicit manifest: Manifest[M]): V
+    def fromMtoV[TM <: M : Manifest](m: TM): V
   }
 }
