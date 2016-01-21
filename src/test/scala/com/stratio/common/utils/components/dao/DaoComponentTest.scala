@@ -91,6 +91,24 @@ class DaoComponentTest extends WordSpec with Matchers {
       }
     }
 
+    "upsert a value" should {
+
+      "return true if the operation is successful" in new DummyDAOComponentContext {
+        dao.upsert("key1", DummyModel("newValue"))
+        dao.get("key1") should be(Some(DummyModel("newValue")))
+        dao.upsert("key1", DummyModel("newValue2"))
+        dao.get("key1") should be(Some(DummyModel("newValue2")))
+        dao.get("key2") should be(None)
+        dao.upsert("key2", DummyModel("newValue"))
+        dao.get("key2") should be(Some(DummyModel("newValue")))
+      }
+
+      "return false if the operation is not successful" in new DummyDAOComponentContext {
+        dao.update("keyNotFound", DummyModel("newValue"))
+        dao.getAll().size should be(3)
+      }
+    }
+
     "getall" should {
 
       "return a list with all the data in the table" in new DummyDAOComponentContext {

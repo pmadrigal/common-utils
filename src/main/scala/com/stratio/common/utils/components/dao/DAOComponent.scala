@@ -43,6 +43,9 @@ trait DAOComponent[K, V, M] {
     def update(id: K, element: M) (implicit manifest: Manifest[M]): Unit =
       repository.update(entity, id, fromMtoV(element))
 
+    def upsert(id: K, element: M) (implicit manifest: Manifest[M]): M =
+      fromVtoM(repository.upsert(entity, id, fromMtoV(element)))
+
     def delete(id: K): Unit =
       repository.delete(entity, id)
 

@@ -45,8 +45,8 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
 
     def get(entity: String, id: String): Option[Array[Byte]] =
       Try(Option(curatorClient
-          .getData
-          .forPath(s"/$entity/$id"))).getOrElse(None)
+        .getData
+        .forPath(s"/$entity/$id"))).getOrElse(None)
 
     def getAll(entity: String): List[Array[Byte]] =
       Try(curatorClient
@@ -74,11 +74,18 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .getOrElse(throw new NoSuchElementException(s"Something were wrong when retrieving element $id after create"))
     }
 
+    def upsert(entity: String, id: String, element: Array[Byte]): Array[Byte] =
+      if (!exists(entity, id)) create(entity, id, element)
+      else {
+        update(entity, id, element)
+        get(entity, id)
+          .getOrElse(throw new NoSuchElementException(s"Something were wrong when retrieving element $id after create"))
+      }
+
     def update(entity: String, id: String, element: Array[Byte]): Unit =
       curatorClient
         .setData()
         .forPath(s"/$entity/$id", element)
-
 
     def delete(entity: String, id: String): Unit =
       curatorClient
@@ -187,7 +194,6 @@ object ZookeeperRepositoryComponent {
   val ZookeeperRetryInterval = "retryInterval"
   val DefaultZookeeperRetryInterval = 10000
   val ConfigZookeeper = "zookeeper"
-
 }
 
 case class ZookeeperRepositoryException(msg: String) extends Exception(msg)
