@@ -63,6 +63,11 @@ trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
       element
     }
 
+    override def upsert(entity: String, id: String, element: String): String = {
+      memoryMap.put(entity, mutable.Map(id -> element))
+      element
+    }
+
     def update(entity:String, id: String, element: String): Unit =
       if (exists(entity, id)) memoryMap.put(entity, mutable.Map(id -> element))
 

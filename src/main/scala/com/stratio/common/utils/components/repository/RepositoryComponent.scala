@@ -29,8 +29,10 @@ trait RepositoryComponent[K, V] {
     def count(entity: String): Long
 
     def exists(entity: String, id: K): Boolean
-    
+
     def create(entity: String, id: K, element: V): V
+
+    def upsert(entity: String, id: K, element: V): V
 
     def update(entity: String, id: K, element: V): Unit
 

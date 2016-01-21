@@ -64,6 +64,13 @@ class ZookeeperIntegrationTest extends WordSpec
       dao.get("test1") should be(Some(Dummy("newValue")))
     }
 
+    "upser the dummy in ZK and get it" in  new DummyDAOComponent {
+      dao.upsert("test1", new Dummy("newValue"))
+      dao.get("test1") should be(Some(Dummy("newValue")))
+      dao.upsert("test1", new Dummy("newValue2"))
+      dao.get("test1") should be(Some(Dummy("newValue2")))
+    }
+
     "delete the dummy in ZK and get it with a None result" in  new DummyDAOComponent {
       dao.delete("test1")
       dao.exists("test1") should be(false)
