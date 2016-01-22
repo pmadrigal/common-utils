@@ -109,7 +109,7 @@ trait TypesafeConfigComponent extends ConfigComponent {
     def toMap: Map[String, Any] = conf.root().toMap
 
     def toStringMap: Map[String, String] =
-      conf.entrySet().map(entry => (entry.getKey, conf.getString(entry.getKey))).toMap[String, String]
+      conf.entrySet().map(entry => (entry.getKey, conf.getAnyRef(entry.getKey).toString)).toMap[String, String]
   }
 
 }
