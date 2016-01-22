@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 import com.stratio.common.utils.components.config.ConfigComponent
 import com.stratio.common.utils.components.logger.LoggerComponent
 import com.stratio.common.utils.components.repository.RepositoryComponent
-import org.apache.curator.framework.recipes.cache.{NodeCache, NodeCacheListener}
+import org.apache.curator.framework.recipes.cache._
 import org.apache.curator.framework.{CuratorFramework, CuratorFrameworkFactory}
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.utils.CloseableUtils
@@ -65,10 +65,10 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
       ).getOrElse(None).isDefined
 
     def create(entity: String, id: String, element: Array[Byte]): Array[Byte] = {
-      curatorClient
+      Try(curatorClient
         .create()
         .creatingParentsIfNeeded()
-        .forPath(s"/$entity/$id", element)
+        .forPath(s"/$entity/$id", element))
 
       get(entity, id)
         .getOrElse(throw new NoSuchElementException(s"Something were wrong when retrieving element $id after create"))
@@ -112,10 +112,11 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
 
     def stop: Boolean = ZookeeperRepository.stop(config)
 
-    def addListener[T <: Serializable](id: String, callback: (T, NodeCache) => Unit)
+    def addListener[T <: Serializable](entity: String,
+                                       id: String, callback: (T, NodeCache) => Unit)
                                       (implicit jsonFormat: Formats, ev: Manifest[T]): Unit = {
 
-      val nodeCache: NodeCache = new NodeCache(curatorClient, id)
+      val nodeCache: NodeCache = new NodeCache(curatorClient, s"/$entity/$id")
 
       nodeCache.getListenable.addListener(
         new NodeCacheListener {
@@ -124,6 +125,19 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
               case Success(value) => callback(read[T](value), nodeCache)
               case Failure(e) => logger.error(s"NodeCache value: ${nodeCache.getCurrentData}", e)
             }
+        }
+      )
+      nodeCache.start()
+    }
+
+    def addEntityListener(entity: String, callback: (PathChildrenCache) => Unit): Unit = {
+
+      val nodeCache: PathChildrenCache = new PathChildrenCache(curatorClient, s"/$entity", true)
+
+      nodeCache.getListenable.addListener(
+        new PathChildrenCacheListener {
+          override def childEvent(client: CuratorFramework, event: PathChildrenCacheEvent): Unit =
+            callback(nodeCache)
         }
       )
       nodeCache.start()
