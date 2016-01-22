@@ -29,17 +29,17 @@ with ZookeeperRepositoryComponent {
 
   val dao: DAO = new GenericDAO()
 
-  class GenericDAO(key: Option[String] = None) extends DAO {
+  implicit val formats = DefaultFormats
 
-    implicit val formats = DefaultFormats
+  class GenericDAO(key: Option[String] = None) extends DAO {
 
     def entity: String = {
       if (key.isEmpty || key.get.trim.isEmpty) throw new IllegalStateException("EntityName in the DAO must be defined")
       else key.get
     }
 
-
     override def fromVtoM[TM >: M <: M : Manifest](v: Array[Byte]): TM = read[TM](new String(v))
+
     override def fromMtoV[TM <: M : Manifest](m: TM): Array[Byte] = write(m).getBytes
   }
 }
