@@ -19,7 +19,7 @@ package com.stratio.common.utils.components.dao
 import com.stratio.common.utils.components.config.ConfigComponent
 import com.stratio.common.utils.components.logger.LoggerComponent
 import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent
-import org.json4s.DefaultFormats
+import org.json4s.{Formats, DefaultFormats}
 import org.json4s.jackson.Serialization._
 
 trait GenericDAOComponent[M <: AnyRef] extends DAOComponent[String, Array[Byte], M]
@@ -29,7 +29,7 @@ with ZookeeperRepositoryComponent {
 
   val dao: DAO = new GenericDAO()
 
-  implicit val formats = DefaultFormats
+  implicit val formats: Formats = DefaultFormats
 
   class GenericDAO(key: Option[String] = None) extends DAO {
 
