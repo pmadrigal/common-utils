@@ -2,6 +2,9 @@
 
 ## 0.5.0 (Upcoming)
 
+## 0.4.1 (January 2016)
+
+- Bug in the serializer of Json4s
 
 ## 0.4.0 (January 2016)
 
