@@ -83,23 +83,26 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
       }
 
     def update(entity: String, id: String, element: Array[Byte]): Unit =
-      curatorClient
+      Try(curatorClient
         .setData()
         .forPath(s"/$entity/$id", element)
+      ).getOrElse(throw new ZookeeperRepositoryException(s"Something were wrong when updating element $id"))
 
     def delete(entity: String, id: String): Unit =
-      curatorClient
+      Try(curatorClient
         .delete()
         .forPath(s"/$entity/$id")
+      ).getOrElse(throw new ZookeeperRepositoryException(s"Something were wrong when deleting element $id"))
 
     def deleteAll(entity: String): Unit =
-      curatorClient
+      Try(curatorClient
         .delete().deletingChildrenIfNeeded()
         .forPath(s"/$entity")
+      ).getOrElse(throw new ZookeeperRepositoryException(s"Something were wrong when deleting all"))
 
     def getZookeeperConfig: Config = {
       config.getConfig(path.getOrElse(ConfigZookeeper))
-        .getOrElse(throw new ZookeeperRepositoryException("Zookeeper config not found"))
+        .getOrElse(throw new ZookeeperRepositoryException(s"Zookeeper config not found"))
     }
 
     def getConfig: Map[String, Any] =
