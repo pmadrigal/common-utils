@@ -53,6 +53,11 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
         .getChildren
         .forPath(s"/$entity").map(get(entity, _).get).toList).getOrElse(List.empty[Array[Byte]])
 
+    def getNodes(entity: String): List[String] =
+      Try(curatorClient
+        .getChildren
+        .forPath(s"/$entity").toList).getOrElse(List.empty[String])
+
     def count(entity: String): Long =
       Try(curatorClient
         .getChildren

@@ -26,6 +26,8 @@ trait RepositoryComponent[K, V] {
 
     def getAll(entity: String): List[V]
 
+    def getNodes(entity: String): List[K]
+
     def count(entity: String): Long
 
     def exists(entity: String, id: K): Boolean

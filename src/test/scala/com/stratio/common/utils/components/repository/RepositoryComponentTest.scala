@@ -52,6 +52,16 @@ class RepositoryComponentTest extends WordSpec
       }
     }
 
+    "getNodes elements" should {
+      "return all nodes if the operation is successful" in new DummyRepositoryContext {
+        repository.getNodes(Entity) should be(List("key1", "key2", "key3"))
+      }
+
+      "return and empty list if the operation is not successful" in new DummyRepositoryContext {
+        repository.getNodes(keyNotFound) should be(List.empty[String])
+      }
+    }
+
     "check if a value exists" should {
 
       "return true if the value exists" in new DummyRepositoryContext {
