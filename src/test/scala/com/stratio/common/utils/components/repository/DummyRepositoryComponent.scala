@@ -44,6 +44,14 @@ trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
         case _ => List.empty[String]
       }
 
+    def getNodes(entity:String): List[String] =
+      memoryMap.get(entity) match {
+        case Some(map: mutable.Map[String,String]) => {
+          map.keys.toList.sortBy(x => x)
+        }
+        case _ => List.empty[String]
+      }
+
     def count(entity: String): Long =
       memoryMap.get(entity) match {
         case Some(value) => value.size
