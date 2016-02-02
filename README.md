@@ -39,6 +39,31 @@ Config
   
   Public interface and functions for use Typesafe configuration library as a Config Component
   
+Metrics - time
+==============
+
+It allows measuring the time that took executing certain block code.
+You can instantiate it by extending an implementation of ```TimeComponent```:
+
+```scala
+object MyModule extends SystemClockTimeComponent
+```
+
+You can measure the time and get the result of evaluating some ```T``` expression:
+
+```scala
+import MyModule._
+val (result, timeItTook) = time(2 + 2)
+```
+
+Or just evaluate the time, ignoring the result:
+
+```scala
+import MyModule._
+val duration = justTime {
+  println(2 + 2)
+}
+```
 
 Functional utilities
 ====================
