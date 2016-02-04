@@ -2,6 +2,11 @@
 
 ## 0.5.0 (Upcoming)
 
+## 0.4.3 (Febrary 2016)
+
+- Added functional features to support iterators over next and has next pattern.
+- Bug corrected in Dao Generic with Formats.
+
 ## 0.4.2 (Febrary 2016)
 
 - Getnodes added in Zookeeper repository.
