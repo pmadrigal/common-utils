@@ -2,6 +2,8 @@
 
 ## 0.5.0 (Upcoming)
 
+- Enabled Scala cross builds for Scala 2.10 and Scala 2.11.
+
 ## 0.4.2 (Febrary 2016)
 
 - Getnodes added in Zookeeper repository.
