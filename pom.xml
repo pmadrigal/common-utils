@@ -41,8 +41,8 @@
         <typesafe.version>1.2.1</typesafe.version>
         <scalatest.version>2.2.2</scalatest.version>
         <junit.version>4.11</junit.version>
-        <akka.version>2.3.4-spark</akka.version>
-        <json4s.version>3.2.11</json4s.version>
+        <akka.version>2.3.11</akka.version>
+        <json4s.version>3.2.10</json4s.version>
         <curator.version>2.9.0</curator.version>
         <spark.version>1.5.2</spark.version>
         <slf4j.version>1.7.7</slf4j.version>
