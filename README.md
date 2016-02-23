@@ -121,3 +121,31 @@ val ite: StatelessIterator[String] =
     if (database.hasResults()) Option(database.read())
     else None)
 ```
+
+Reflect type utilities
+----------------------
+
+It provides a fancy DSL (so an easy way) to determine type equality in Scala.
+
+I.e.:
+
+```scala
+import scala.reflect.classTag
+import com.stratio.common.utils.functional._
+
+class Kid
+class Daddy extends Kid
+class Grandpa extends Daddy
+
+classTag[Kid].isA[Kid] //true
+classTag[Kid].isA[Daddy] //false
+classTag[Daddy].isA[Grandpa] //false
+classTag[Grandpa].isA[Kid] //true
+
+classTag[Kid].isExactlyA[Kid] //true
+classTag[Kid].isExactlyA[Daddy] //false
+classTag[Daddy].isExactlyA[Grandpa] //false
+classTag[Grandpa].isExactlyA[Grandpa] //true
+```
+
+It also works providing the ```Class``` with ```classOf[Kid]``` instead of the ```ClassTag```.

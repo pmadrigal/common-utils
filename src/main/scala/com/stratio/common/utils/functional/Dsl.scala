@@ -16,6 +16,10 @@
 
 package com.stratio.common.utils.functional
 
+import scala.reflect.ClassTag
+
+import com.stratio.common.utils.functional.reflect.ClassTagHelper
+
 /**
  * Provides a higher layer of abstraction for using
  * extended functionality at 'functional' package.
@@ -41,5 +45,9 @@ trait Dsl {
   def iterator[T](
     nextFunc: => Option[T]): StatelessIterator[T] =
     StatelessIterator[T](nextFunc)
+
+  implicit class classTagHelper[T:ClassTag](ct: ClassTag[T]) extends ClassTagHelper(ct)
+
+  implicit class classHelper[T](_class: Class[T]) extends ClassTagHelper(ClassTag[T](_class))
 
 }
