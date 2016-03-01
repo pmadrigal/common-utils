@@ -48,8 +48,8 @@ class Cancellable[T](executionContext: ExecutionContext, todo: => T) {
 
   implicit val _: ExecutionContext = executionContext
 
-  val fut: Future[T] = Future {
-    jf.get()
+  val future: Future[T] = Future {
+    jf.get
   }
 
   /**

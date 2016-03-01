@@ -42,7 +42,7 @@ class CancellableUT extends FlatSpec with Matchers {
       expectedRes
     }
 
-    Await.result(ct.fut, 2 seconds) shouldBe 42
+    Await.result(ct.future, 2 seconds) shouldBe 42
 
   }
 
@@ -54,8 +54,8 @@ class CancellableUT extends FlatSpec with Matchers {
     }
 
     failAfter(tsleep) {
-      ct.cancel()
-      Await.ready(ct.fut, tsleep*2).value should matchPattern {
+      ct.cancel
+      Await.ready(ct.future, tsleep*2).value should matchPattern {
         case Some(Failure(_: CancellationException)) =>
       }
     }
