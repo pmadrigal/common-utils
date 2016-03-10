@@ -149,3 +149,19 @@ classTag[Grandpa].isExactlyA[Grandpa] //true
 ```
 
 It also works providing the ```Class``` with ```classOf[Kid]``` instead of the ```ClassTag```.
+
+Concurrent utilities
+====================
+
+Future.option
+-------------
+
+Despite of not having a way a to invoke ```Future.sequence``` with an ```Option``` , the concurrent utilities provide
+  a nice ```Option[Future[T]] => Future[Option[T]]``` function with the ```Future.option``` method:
+
+```scala
+import com.stratio.common.utils.concurrent._
+
+val someFuture = Option(Future(1))
+val result: Future[Option[Int]] = Future.option(someFuture)
+```

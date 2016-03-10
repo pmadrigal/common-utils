@@ -2,6 +2,9 @@
 
 ## 0.6.0 (Upcoming)
 
+- Added compatibility for invoking Future.sequence for Options in Scala [(SI-9694)](https://issues.scala-lang
+.org/browse/SI-9694)
+
 ## 0.5.0 (March 2016)
 
 - Enabled Scala cross builds for Scala 2.10 and Scala 2.11.
