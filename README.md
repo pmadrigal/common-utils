@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/Stratio/Common-utils/badge.svg?branch=master)](https://coveralls.io/github/Stratio/Common-utils?branch=master)
+
 # Stratio Common Library
 
 This scala repository is a common library developed in Scala for use libraries with common features, this can be used
