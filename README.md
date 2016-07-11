@@ -152,6 +152,86 @@ classTag[Grandpa].isExactlyA[Grandpa] //true
 
 It also works providing the ```Class``` with ```classOf[Kid]``` instead of the ```ClassTag```.
 
+
+Monad Transformers utilities
+----------------------
+
+Using Monad Transformers you can work with complex types easily. Currently, there are two types
+supported: ```Try[List[A]]``` and ```Try[Option[A]]```. Also, you can use ```Either[Throwable, List[A]]```
+and ```Either[Throwable, Option[A]]``` equivalently.
+
+The way to work with this functionality is using for comprehensions. With monad transformers we can iterate
+through two levels of types. For example, if we have a ```Try[List[A]]```, we can iterate the list keeping the
+type ```Try```. The same with the type ```Try[Option[A]]```.
+
+Method to uses Monad Transformers with list is called ```get values```. On the other hand, using ```get value```
+you could use it with an ```Option``` type.
+
+I.e.:
+
+```scala
+
+  import com.stratio.common.utils.functional.MonadTransformerDSL._
+  import TryFunctorConversionUtils._
+
+  (for {
+    x <- get values Try(List("a", "b"))
+  } yield (x, x)).run  //Try(List(("a", "a"), ("b", "b")))
+
+  (for {
+    x <- get value Try(Option("a"))
+  } yield (x, x)).run  //Try(Option(("a", "a")))
+
+```
+
+Have in mind that to undone the monad transformer and keep working with the original types, it is necessary a call to the
+```run``` method.
+
+To complement the monad transformers with ```Option``` types, it's also provided some extra functionality:
+
+- ```orThrow```: throw an exception if the ```Option``` is ```None```.
+
+```scala
+
+  (for {
+    x <- get value Try(Option("a")) orThrow new Exception("Exception message")
+  } yield (x, x)).run  //Try(Option(("a", "a")))
+
+  (for {
+    x <- get value Try(None) orThrow new Exception("Exception message")
+  } yield (x, x)).run  //An exception is thrown
+
+```
+
+- ```flatten```: it realizes a flatten. The ```Optio```n is removed but keeping the ```Try```.
+An exception is thrown if the ```Option``` is ```None```.
+
+```scala
+
+  (for {
+    x <- get value Try(Option("a"))
+  } yield (x, x)).run.flatten  //Try(("a", "a"))
+
+  (for {
+    x <- get value Try(None)
+  } yield (x, x)).run.flatten  //An exception is thrown
+
+```
+
+- ```flattenOr```: same functionality as flatten but providing an alternative if the ```Option``` is ```None```.
+
+```scala
+
+  (for {
+    x <- get value Try(Option("a"))
+  } yield (x, x)).run.flattenOr(("b", "b"))  //Try(("a", "a"))
+
+  (for {
+    x <- get value Try(None)
+  } yield (x, x)).run.flattenOr(("b", "b"))  //Try(("b", "b"))
+
+```
+
 Concurrent utilities
 ====================
 
