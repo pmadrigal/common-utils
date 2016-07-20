@@ -247,3 +247,51 @@ import com.stratio.common.utils.concurrent._
 val someFuture = Option(Future(1))
 val result: Future[Option[Int]] = Future.option(someFuture)
 ```
+
+Akka high level Keep-Alive heartbeat and monitor
+------------------------------------------------
+
+This tool set provides a mechanism implementing a dead man switch
+in Akka not relying on low level transport features and this way being
+compatible with both remote and local modes. It relies on the use of a
+configurable **id** for monitored services identification.
+
+It is composed by two parts:
+
+* `MonitoredActor` trait which automatically makes the mixer actor a heart beater for the set id.
+* The `KeepAliveMaster` is an actor whereby dead monitored services (identified by `id`) are detected. It offers a messaging interface.
+
+This is an example of a rather silly monitored actor:
+
+    class MonitoredActor(override val keepAliveId: Int, override val master: ActorRef) extends LiveMan[Int] {
+        override val period: FiniteDuration = 100 milliseconds
+
+        override def receive: Receive = PartialFunction.empty
+    }
+    
+    val liveMan: ActorRef = system.actorOf(Props(new MonitoredActor(42, testActor)))
+    
+    
+Silly for its only purpose is to be monitored but it could perform whatever task any regular actor can.
+In this case, the service identifying `id` is and integer and is provided at build time: `override val keepAliveId: Int`
+
+To set a monitor and subscribe it to our silly actor heartbeats you can just do as follows:
+
+
+    val master: ActorRef = system.actorOf(KeepAliveMaster.props[Int](testActor)) // This creates the monitor actor...
+    
+    master ! DoCheck(42, 200 milliseconds) // And it is told to monitor the service with id = 42
+    
+ 
+`testActor` in the snippet above is the `ActorRef` of the actor to be notified when a monitored service has fallen.
+  
+`DoCheck` has 3 parameters:
+ 
+1. `id` being monitored. The monitor will not care about which actor confirmed and `id`. It'll just be concerned on the `id` being confirmed. This enables control over high availability services as it abstract the underlying provider.
+2. `period` for which heartbeats, from a specific id, are expected to be received at least once before raising miss alarms for that id.
+3. `continueMonitoring` (OPTIONAL, default: `false`) is a flag telling whether an `id` should still be monitored after its service has fallen (`true`) or not (`false`, default).
+  
+`testActor` will receive `HeartbeatLost(fallenId)` when the by-that-id identified service has stopped its heartbeat.
+
+
+  

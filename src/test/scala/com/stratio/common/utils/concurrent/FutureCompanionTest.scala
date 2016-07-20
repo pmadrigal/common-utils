@@ -15,11 +15,14 @@
  */
 package com.stratio.common.utils.concurrent
 
+import org.junit.runner.RunWith
+
 import scala.concurrent.Future
-
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.{FlatSpec, Matchers}
 
+@RunWith(classOf[JUnitRunner])
 class FutureCompanionTest extends FlatSpec with Matchers with ScalaFutures{
 
   behavior of "FutureCompanion"
