@@ -2,6 +2,7 @@
 
 ## 0.6.0 (Upcoming)
 
+* Draft .jenkins.yml
 * Added coveralls badge
 * Added compatibility for invoking Future.sequence for Options in Scala [(SI-9694)](https://issues.scala-lang
 .org/browse/SI-9694)
