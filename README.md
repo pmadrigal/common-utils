@@ -1,4 +1,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/Stratio/Common-utils/badge.svg?branch=master)](https://coveralls.io/github/Stratio/Common-utils?branch=master)
+[![Maven Central - scala 2.10](https://maven-badges.herokuapp.com/maven-central/com.stratio.common/common-utils_2.10/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.stratio.common/common-utils_2.10)
+[![Maven Central - scala 2.11](https://maven-badges.herokuapp.com/maven-central/com.stratio.common/common-utils_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.stratio.common/common-utils_2.11)
 
 # Stratio Common Library
 
