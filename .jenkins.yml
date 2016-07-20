@@ -1,0 +1,7 @@
+CROSSBUILD:
+  - 'scala-2.10'
+  - 'scala-2.11'
+
+MAIL: jdelgado
+
+FOSS: true
