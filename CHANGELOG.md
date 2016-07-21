@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0 (upcoming)
+
+* Pending changelog
+
 ## 0.6.0 (Upcoming)
 
 * Added coveralls badge
