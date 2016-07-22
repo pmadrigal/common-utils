@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.0 (Upcoming)
+## 0.6.0 (July 22, 2016)
 
 * Added coveralls badge
 * Added compatibility for invoking Future.sequence for Options in Scala [(SI-9694)](https://issues.scala-lang.org/browse/SI-9694)
