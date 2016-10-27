@@ -2,9 +2,14 @@
 
 ## 0.7.0 (upcoming)
 
-* Pending changelog
+* Upgrade typesafe config to 1.3.0
+* Upgrade akka to 2.4.9
+* Upgrade json4s to 3.4.0
+* Upgrade spark to 1.6.2
+* Remove scala 2.10
+* Upgrade curator to 3.2.0
 
-## 0.6.0 (Upcoming)
+## 0.6.0 (July 2016)
 
 * Added coveralls badge
 * Added compatibility for invoking Future.sequence for Options in Scala [(SI-9694)](https://issues.scala-lang
