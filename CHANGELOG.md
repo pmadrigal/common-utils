@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0 (upcoming)
+
+* Pending changelog
+
 ## 0.7.0 (upcoming)
 
 * Upgrade typesafe config to 1.3.0
