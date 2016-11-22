@@ -8,18 +8,20 @@ hose {
     FOSS = true
     REPOSITORY = 'common-utils'
     
+    CROSSBUILD = ['scala-2.11']
+    
     DEV = { config ->
     
-        doCompile(config)
-        doUT(config)
-        doPackage(config)
+        doCompile(conf: config, crossbuild: config.CROSSBUILD[0])
+        doUT(conf: config, crossbuild: config.CROSSBUILD[0])
+        doPackage(conf: config, crossbuild: config.CROSSBUILD[0])
 
         parallel(DOC: {
-            doDoc(config)
+            doDoc(conf: config, crossbuild: config.CROSSBUILD[0])
         }, QC: {
-            doStaticAnalysis(config)
+            doStaticAnalysis(conf: config, crossbuild: config.CROSSBUILD[0])
         }, DEPLOY: {
-            doDeploy(config)
+            doDeploy(conf: config, crossbuild: config.CROSSBUILD[0])
         }, failFast: config.FAILFAST)
 
     }
