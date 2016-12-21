@@ -19,6 +19,8 @@ import com.stratio.common.utils.components.repository.DummyRepositoryComponent
 import org.json4s.DefaultFormats
 import org.scalatest.{Matchers, WordSpec}
 
+import scala.util.{Success, Try}
+
 class DaoComponentTest extends WordSpec with Matchers {
 
   trait DummyDAOComponentContext extends DummyDAOComponent {
@@ -40,11 +42,11 @@ class DaoComponentTest extends WordSpec with Matchers {
     "check if a value exists" should {
 
       "return true if the value exists" in new DummyDAOComponentContext {
-        dao.exists("key1") should be(true)
+        dao.exists("key1") should matchPattern {case Success(true) => }
       }
 
       "return false if the value doesn't exist" in new DummyDAOComponentContext {
-        dao.exists("keyNotFound") should be(false)
+        dao.exists("keyNotFound") should matchPattern {case Success(false) => }
       }
     }
 
@@ -72,7 +74,7 @@ class DaoComponentTest extends WordSpec with Matchers {
 
       "return false if the operation is not successful" in new DummyDAOComponentContext {
         dao.delete("keyNotFound")
-        dao.getAll().size should be(3)
+        dao.getAll().map(_.size) should matchPattern {case Success(3) => }
       }
     }
 
@@ -86,7 +88,7 @@ class DaoComponentTest extends WordSpec with Matchers {
 
       "return false if the operation is not successful" in new DummyDAOComponentContext {
         dao.update("keyNotFound", DummyModel("newValue"))
-        dao.getAll().size should be(3)
+        dao.getAll().map(_.size) should matchPattern {case Success(3) => }
       }
     }
 
@@ -104,7 +106,7 @@ class DaoComponentTest extends WordSpec with Matchers {
 
       "return false if the operation is not successful" in new DummyDAOComponentContext {
         dao.update("keyNotFound", DummyModel("newValue"))
-        dao.getAll().size should be(3)
+        dao.getAll().map(_.size) should matchPattern {case Success(3) => }
       }
     }
 

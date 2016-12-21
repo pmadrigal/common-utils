@@ -15,30 +15,32 @@
  */
 package com.stratio.common.utils.components.repository
 
+import scala.util.Try
+
 trait RepositoryComponent[K, V] {
 
   val repository: Repository
 
   trait Repository {
 
-    def get(entity: String, id: K): Option[V]
+    def get(entity: String, id: K): Try[Option[V]]
 
-    def getAll(entity: String): List[V]
+    def getAll(entity: String): Try[Seq[V]]
 
-    def getNodes(entity: String): List[K]
+    def getNodes(entity: String): Try[Seq[K]]
 
-    def count(entity: String): Long
+    def count(entity: String): Try[Long]
 
-    def exists(entity: String, id: K): Boolean
+    def exists(entity: String, id: K): Try[Boolean]
 
-    def create(entity: String, id: K, element: V): V
+    def create(entity: String, id: K, element: V): Try[V]
 
-    def upsert(entity: String, id: K, element: V): V
+    def upsert(entity: String, id: K, element: V): Try[V]
 
-    def update(entity: String, id: K, element: V): Unit
+    def update(entity: String, id: K, element: V): Try[Unit]
 
-    def delete(entity: String, id: K): Unit
+    def delete(entity: String, id: K): Try[Unit]
 
-    def deleteAll(entity: String): Unit
+    def deleteAll(entity: String): Try[Unit]
   }
 }

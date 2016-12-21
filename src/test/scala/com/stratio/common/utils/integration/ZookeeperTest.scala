@@ -24,6 +24,8 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 
+import scala.util.{Failure, Success}
+
 @RunWith(classOf[JUnitRunner])
 class ZookeeperIntegrationTest extends WordSpec
   with Matchers
@@ -55,32 +57,32 @@ class ZookeeperIntegrationTest extends WordSpec
 
     "save a dummy in ZK and get it" in  new DummyDAOComponent {
       dao.create("test1", new Dummy("value"))
-      dao.get("test1") should be(Some(Dummy("value")))
+      dao.get("test1") should be(Success(Some(Dummy("value"))))
     }
 
     "update the dummy in ZK and get it" in  new DummyDAOComponent {
       dao.update("test1", new Dummy("newValue"))
-      dao.get("test1") should be(Some(Dummy("newValue")))
+      dao.get("test1") should be(Success(Some(Dummy("newValue"))))
     }
 
     "upser the dummy in ZK and get it" in  new DummyDAOComponent {
       dao.upsert("test1", new Dummy("newValue"))
-      dao.get("test1") should be(Some(Dummy("newValue")))
+      dao.get("test1") should be(Success(Some(Dummy("newValue"))))
       dao.upsert("test1", new Dummy("newValue2"))
-      dao.get("test1") should be(Some(Dummy("newValue2")))
+      dao.get("test1") should be(Success(Some(Dummy("newValue2"))))
     }
 
     "delete the dummy in ZK and get it with a None result" in  new DummyDAOComponent {
       dao.delete("test1")
-      dao.exists("test1") should be(false)
+      dao.exists("test1") should be (Success(false))
     }
 
     "save a dummy in ZK and delete all" in  new DummyDAOComponent {
       dao.create("test1", new Dummy("value"))
-      dao.get("test1") should be(Some(Dummy("value")))
+      dao.get("test1") should be(Success(Some(Dummy("value"))))
       dao.deleteAll
-      dao.exists("test1") should be(false)
-      dao.count() should be(0)
+      dao.exists("test1") should be (Success(false))
+      dao.count() shouldBe a[Failure[_]]
     }
   }
 }

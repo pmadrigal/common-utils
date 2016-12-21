@@ -17,6 +17,8 @@ package com.stratio.common.utils.components.dao
 
 import com.stratio.common.utils.components.repository.RepositoryComponent
 
+import scala.util.Try
+
 trait DAOComponent[K, V, M] {
   self: RepositoryComponent[K, V] =>
 
@@ -24,31 +26,31 @@ trait DAOComponent[K, V, M] {
 
   trait DAO {
 
-    def get(id: K) (implicit manifest: Manifest[M]): Option[M] =
-      repository.get(entity, id).map(entity => fromVtoM(entity))
+    def get(id: K) (implicit manifest: Manifest[M]): Try[Option[M]] =
+      repository.get(entity, id).map(_.map(entity => fromVtoM(entity)))
 
-    def getAll() (implicit manifest: Manifest[M]): List[M] =
-      repository.getAll(entity).map(fromVtoM(_))
+    def getAll() (implicit manifest: Manifest[M]): Try[Seq[M]] =
+      repository.getAll(entity).map(_.map(fromVtoM))
 
-    def count(): Long =
+    def count(): Try[Long] =
       repository.count(entity)
 
-    def exists(id: K): Boolean =
+    def exists(id: K): Try[Boolean] =
       repository.exists(entity, id)
 
-    def create(id: K, element: M) (implicit manifest: Manifest[M]): M =
-      fromVtoM(repository.create(entity, id, fromMtoV(element)))
+    def create(id: K, element: M) (implicit manifest: Manifest[M]): Try[M] =
+      repository.create(entity, id, fromMtoV(element)).map(fromVtoM)
 
-    def update(id: K, element: M) (implicit manifest: Manifest[M]): Unit =
+    def update(id: K, element: M) (implicit manifest: Manifest[M]): Try[Unit] =
       repository.update(entity, id, fromMtoV(element))
 
-    def upsert(id: K, element: M) (implicit manifest: Manifest[M]): M =
-      fromVtoM(repository.upsert(entity, id, fromMtoV(element)))
+    def upsert(id: K, element: M) (implicit manifest: Manifest[M]): Try[M] =
+      repository.upsert(entity, id, fromMtoV(element)).map(fromVtoM)
 
-    def delete(id: K): Unit =
+    def delete(id: K): Try[Unit] =
       repository.delete(entity, id)
 
-    def deleteAll: Unit =
+    def deleteAll: Try[Unit] =
       repository.deleteAll(entity)
 
     def entity: String
