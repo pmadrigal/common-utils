@@ -4,7 +4,7 @@
 
 * Pending changelog
 
-## 0.8.0 (January 2017)
+## 0.8.0 (January 30, 2017)
 
 * Update Zookeeper repository management
 
