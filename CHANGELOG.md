@@ -4,7 +4,7 @@
 
 * Pending changelog
 
-## 0.9.0 (upcoming)
+## 0.9.0 (February 07, 2017)
 
 * Pending changelog
 
