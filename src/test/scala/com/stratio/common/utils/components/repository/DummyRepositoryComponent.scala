@@ -45,6 +45,12 @@ trait DummyRepositoryComponent extends RepositoryComponent[String, String] {
     def count(entity: String): Try[Long] =
       Try(memoryMap.get(entity).map(_.size).getOrElse(0).toLong)
 
+
+    def existsPath(entity: String): Try[Boolean] =
+      Try(memoryMap.exists { case (key, _) =>
+        key == entity
+      })
+
     def exists(entity: String, id: String): Try[Boolean] =
       Try(memoryMap.exists { case (key, entityMap) =>
         key == entity && entityMap.keys.toList.contains(id)

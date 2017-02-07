@@ -31,6 +31,8 @@ trait RepositoryComponent[K, V] {
 
     def count(entity: String): Try[Long]
 
+    def existsPath(entity: String): Try[Boolean]
+
     def exists(entity: String, id: K): Try[Boolean]
 
     def create(entity: String, id: K, element: V): Try[V]

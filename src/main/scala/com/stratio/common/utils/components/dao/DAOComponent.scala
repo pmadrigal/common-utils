@@ -35,6 +35,9 @@ trait DAOComponent[K, V, M] {
     def count(): Try[Long] =
       repository.count(entity)
 
+    def existsPath: Try[Boolean] =
+      repository.existsPath(entity)
+
     def exists(id: K): Try[Boolean] =
       repository.exists(entity, id)
 
