@@ -1,12 +1,16 @@
 # Changelog
 
+Only listing significant user-visible, not internal code cleanups and minor bug fixes.
+
 ## 0.10.0 (upcoming)
 
-* Pending changelog
+* Bump Spark to 2.1.0
+* Bump Curator to 3.2.0
+* Remove Spark Logging
 
 ## 0.9.0 (February 07, 2017)
 
-* Pending changelog
+* Add exists path in DAO Components
 
 ## 0.8.0 (January 30, 2017)
 
