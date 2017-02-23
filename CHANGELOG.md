@@ -6,7 +6,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 * Pending changelog
 
-## 0.10.0 (upcoming)
+## 0.10.0 (February 23, 2017)
 
 * Bump Spark to 2.1.0
 * Bump Curator to 3.2.0
