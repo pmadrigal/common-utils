@@ -30,11 +30,6 @@ Logger
   
   Public interface and functions for use SLF4J library as a Logger Component
   
-
-- Spark:
-  
-  Public interface and functions for use the Spark Logger interface as a Logger Component, internally use SLF4J library.
-  
   
 Config
 ============
