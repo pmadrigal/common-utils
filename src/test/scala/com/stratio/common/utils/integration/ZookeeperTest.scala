@@ -18,6 +18,7 @@ package com.stratio.common.utils.integration
 import com.stratio.common.utils.components.config.impl.TypesafeConfigComponent
 import com.stratio.common.utils.components.dao.GenericDAOComponent
 import com.stratio.common.utils.components.logger.impl.Slf4jLoggerComponent
+import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent
 import org.apache.curator.test.TestingServer
 import org.apache.curator.utils.CloseableUtils
 import org.junit.runner.RunWith
@@ -55,30 +56,33 @@ class ZookeeperIntegrationTest extends WordSpec
 
   "A dao component" should {
 
-    "save a dummy in ZK and get it" in  new DummyDAOComponent {
-      dao.create("test1", new Dummy("value"))
+    val component = new DummyZookeeperDAOComponent
+    import component.dao
+
+    "save a dummy in ZK and get it" in {
+      dao.create("test1", Dummy("value"))
       dao.get("test1") should be(Success(Some(Dummy("value"))))
     }
 
-    "update the dummy in ZK and get it" in  new DummyDAOComponent {
-      dao.update("test1", new Dummy("newValue"))
+    "update the dummy in ZK and get it" in {
+      dao.update("test1", Dummy("newValue"))
       dao.get("test1") should be(Success(Some(Dummy("newValue"))))
     }
 
-    "upser the dummy in ZK and get it" in  new DummyDAOComponent {
-      dao.upsert("test1", new Dummy("newValue"))
+    "upser the dummy in ZK and get it" in {
+      dao.upsert("test1", Dummy("newValue"))
       dao.get("test1") should be(Success(Some(Dummy("newValue"))))
-      dao.upsert("test1", new Dummy("newValue2"))
+      dao.upsert("test1", Dummy("newValue2"))
       dao.get("test1") should be(Success(Some(Dummy("newValue2"))))
     }
 
-    "delete the dummy in ZK and get it with a None result" in  new DummyDAOComponent {
+    "delete the dummy in ZK and get it with a None result" in {
       dao.delete("test1")
       dao.exists("test1") should be (Success(false))
     }
 
-    "save a dummy in ZK and delete all" in  new DummyDAOComponent {
-      dao.create("test1", new Dummy("value"))
+    "save a dummy in ZK and delete all" in {
+      dao.create("test1", Dummy("value"))
       dao.get("test1") should be(Success(Some(Dummy("value"))))
       dao.deleteAll
       dao.exists("test1") should be (Success(false))
@@ -87,10 +91,13 @@ class ZookeeperIntegrationTest extends WordSpec
   }
 }
 
-
-trait DummyDAOComponent extends GenericDAOComponent[Dummy] with TypesafeConfigComponent with Slf4jLoggerComponent {
+class DummyZookeeperDAOComponent extends GenericDAOComponent[Dummy]
+  with ZookeeperRepositoryComponent
+  with TypesafeConfigComponent
+  with Slf4jLoggerComponent {
 
   override val dao : DAO = new GenericDAO(Option("dummy"))
+
 }
 
 case class Dummy(property: String) {}

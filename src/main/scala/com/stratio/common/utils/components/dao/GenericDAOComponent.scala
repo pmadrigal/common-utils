@@ -15,16 +15,12 @@
  */
 package com.stratio.common.utils.components.dao
 
-import com.stratio.common.utils.components.config.ConfigComponent
-import com.stratio.common.utils.components.logger.LoggerComponent
-import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent
-import org.json4s.{Formats, DefaultFormats}
+import com.stratio.common.utils.components.repository.RepositoryComponent
+import org.json4s.{DefaultFormats, Formats}
 import org.json4s.jackson.Serialization._
 
-trait GenericDAOComponent[M <: AnyRef] extends DAOComponent[String, Array[Byte], M]
-with ZookeeperRepositoryComponent {
-
-  self: ConfigComponent with LoggerComponent =>
+trait GenericDAOComponent[M <: AnyRef] extends DAOComponent[String, Array[Byte], M] {
+  self: RepositoryComponent[String, Array[Byte]] =>
 
   val dao: DAO = new GenericDAO()
 
