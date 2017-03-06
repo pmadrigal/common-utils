@@ -24,8 +24,13 @@ trait TransactionManagerComponent[K,V] {
   self: RepositoryComponent[K, V] =>
 
   trait TransactionalRepository extends Repository {
-    def atomically[T](firstResource: TransactionResource, resources: TransactionResource*)(block: => T): T
-    def atomically[T](block: => T): T = atomically[T](Dao)(block)
+
+    def atomically[T](entity: String,
+      firstResource: TransactionResource,
+      resources: TransactionResource*
+    )(block: => T): T
+
+    final def atomically[T](entity: String)(block: => T): T = atomically[T](entity, Dao)(block)
   }
 
 }

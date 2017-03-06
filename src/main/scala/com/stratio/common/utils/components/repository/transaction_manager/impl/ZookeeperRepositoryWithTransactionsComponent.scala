@@ -20,6 +20,8 @@ import com.stratio.common.utils.components.config.ConfigComponent
 import com.stratio.common.utils.components.logger.LoggerComponent
 import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent
 import com.stratio.common.utils.components.repository.transaction_manager.TransactionManagerComponent
+import com.stratio.common.utils.components.repository.transaction_manager.TransactionResource
+import org.apache.curator.framework.recipes.locks.InterProcessMutex
 
 trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryComponent
   with TransactionManagerComponent[String, Array[Byte]] {
@@ -29,7 +31,55 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
   class ZookeeperRepositoryWithTransactions(path: Option[String] = None) extends ZookeeperRepository(path)
     with TransactionalRepository {
 
-    override def atomically[T](block: => T): T = ???
+    //TODO: Improve path option usage
+    private def acquisitionResource: String = s"${path.getOrElse("")}/locks"
+
+    private object AcquiredLocks {
+
+      import collection.mutable.Map
+
+      private val acquisitionLock: InterProcessMutex = new InterProcessMutex(curatorClient, acquisitionResource)
+
+      private val path2lock: Map[String, InterProcessMutex] = Map.empty
+
+      def acquireResources(paths: Seq[String]): Unit = {
+        acquisitionLock.acquire()
+        paths foreach { path =>
+          val lock = path2lock.get(path) getOrElse {
+            val newLock = new InterProcessMutex(curatorClient, path)
+            path2lock += (path -> newLock)
+            newLock
+          }
+          lock.acquire()
+        }
+        acquisitionLock.release()
+      }
+
+      def freeResources(paths: Seq[String]): Unit = for {
+        path <- paths
+        lock <- path2lock.get(path)
+      } lock.release()
+
+    }
+
+    private def lockPath(entity: String)(resource: TransactionResource): String = {
+      s"$entity/locks"
+    }
+
+    override def atomically[T](
+                                entity: String,
+                                firstResource: TransactionResource,
+                                resources: TransactionResource*)(block: => T): T = {
+
+      val paths = (firstResource +: resources).map(lockPath(entity))
+      AcquiredLocks.acquireResources(paths)
+      val res = try {
+        block
+      } finally {
+        AcquiredLocks.freeResources(paths)
+      }
+      res
+    }
 
   }
 

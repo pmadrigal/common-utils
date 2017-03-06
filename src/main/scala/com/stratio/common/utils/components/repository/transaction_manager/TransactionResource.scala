@@ -23,7 +23,7 @@ trait TransactionResource {
 object TransactionResource {
 
   object Dao extends TransactionResource {
-    override def id: String = "dao"
+    override def id: String = "_dao"
   }
 
 }
