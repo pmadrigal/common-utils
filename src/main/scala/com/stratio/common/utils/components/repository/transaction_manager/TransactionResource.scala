@@ -16,16 +16,14 @@
  */
 package com.stratio.common.utils.components.repository.transaction_manager
 
-import com.stratio.common.utils.components.repository.RepositoryComponent
-import com.stratio.common.utils.components.repository.transaction_manager.TransactionResource.Dao
+trait TransactionResource {
+  def id: String
+}
 
-trait TransactionManagerComponent[K,V] {
+object TransactionResource {
 
-  self: RepositoryComponent[K, V] =>
-
-  trait TransactionalRepository extends Repository {
-    def atomically[T](firstResource: TransactionResource, resources: TransactionResource*)(block: => T): T
-    def atomically[T](block: => T): T = atomically[T](Dao)(block)
+  object Dao extends TransactionResource {
+    override def id: String = "dao"
   }
 
 }
