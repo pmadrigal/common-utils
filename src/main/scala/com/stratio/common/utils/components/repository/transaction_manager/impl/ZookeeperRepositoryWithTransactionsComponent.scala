@@ -44,21 +44,29 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
 
       def acquireResources(paths: Seq[String]): Unit = {
         acquisitionLock.acquire()
-        paths foreach { path =>
-          val lock = path2lock.get(path) getOrElse {
-            val newLock = new InterProcessMutex(curatorClient, path)
-            path2lock += (path -> newLock)
-            newLock
+        path2lock.synchronized {
+          paths foreach { path =>
+            val lock = path2lock.get(path) getOrElse {
+              val newLock = new InterProcessMutex(curatorClient, path)
+              path2lock += (path -> newLock)
+              newLock
+            }
+            lock.acquire()
           }
-          lock.acquire()
         }
         acquisitionLock.release()
       }
 
-      def freeResources(paths: Seq[String]): Unit = for {
-        path <- paths
-        lock <- path2lock.get(path)
-      } lock.release()
+      def freeResources(paths: Seq[String]): Unit = path2lock.synchronized {
+        for {
+          path <- paths
+          lock <- path2lock.get(path)
+        } {
+          lock.release()
+          if(!lock.isAcquiredInThisProcess)
+            path2lock -= path
+        }
+      }
 
     }
 
