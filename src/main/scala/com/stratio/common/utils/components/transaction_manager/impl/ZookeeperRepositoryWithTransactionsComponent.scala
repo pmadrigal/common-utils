@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.common.utils.components.repository.transaction_manager.impl
+package com.stratio.common.utils.components.transaction_manager.impl
 
 import com.stratio.common.utils.components.config.ConfigComponent
 import com.stratio.common.utils.components.logger.LoggerComponent
 import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent
-import com.stratio.common.utils.components.repository.transaction_manager.TransactionManagerComponent
-import com.stratio.common.utils.components.repository.transaction_manager.TransactionResource
+import com.stratio.common.utils.components.transaction_manager.{TransactionManagerComponent, TransactionResource}
 import org.apache.curator.framework.recipes.locks.InterProcessMutex
 
 trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryComponent

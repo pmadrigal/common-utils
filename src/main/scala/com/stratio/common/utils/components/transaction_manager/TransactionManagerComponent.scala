@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.common.utils.components.repository.transaction_manager
+package com.stratio.common.utils.components.transaction_manager
 
 import com.stratio.common.utils.components.repository.RepositoryComponent
-import com.stratio.common.utils.components.repository.transaction_manager.TransactionResource.Dao
+import TransactionResource.Dao
 
 trait TransactionManagerComponent[K,V] {
 

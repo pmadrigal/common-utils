@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.common.utils.components.repository.transaction_manager
+package com.stratio.common.utils.components.transaction_manager
 
 trait TransactionResource {
   def id: String
