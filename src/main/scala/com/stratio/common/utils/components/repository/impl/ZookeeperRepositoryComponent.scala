@@ -111,7 +111,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
       )
 
     def getZookeeperConfig: Config = {
-      config.getConfig(path.getOrElse(ConfigZookeeper))
+      config.getConfig(ConfigZookeeper)
         .getOrElse(throw new ZookeeperRepositoryException(s"Zookeeper config not found"))
     }
 
