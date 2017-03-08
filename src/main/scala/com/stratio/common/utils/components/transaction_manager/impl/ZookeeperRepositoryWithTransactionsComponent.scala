@@ -27,6 +27,8 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
 
   self: ConfigComponent with LoggerComponent =>
 
+  override val repository: ZookeeperRepositoryWithTransactions = new ZookeeperRepositoryWithTransactions(None)
+
   class ZookeeperRepositoryWithTransactions(path: Option[String] = None) extends ZookeeperRepository(path)
     with TransactionalRepository {
 
@@ -70,7 +72,7 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
     }
 
     private def lockPath(entity: String)(resource: TransactionResource): String = {
-      s"$entity/locks"
+      s"$entity/locks/${resource.id}"
     }
 
     override def atomically[T](
