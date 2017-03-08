@@ -1,15 +1,17 @@
 
-package com.stratio.common.utils.components.transaction_manager
+package com.stratio.common.utils.integration
 
 import com.stratio.common.utils.components.config.impl.TypesafeConfigComponent
 import com.stratio.common.utils.components.logger.impl.Slf4jLoggerComponent
+import com.stratio.common.utils.components.transaction_manager.TransactionResource
 import com.stratio.common.utils.components.transaction_manager.impl.ZookeeperRepositoryWithTransactionsComponent
 
-object TestClient extends App {
+object ZKTransactionTestClient extends App {
 
   case class Resource(id: String) extends TransactionResource
 
-  val usageMsg = "Usage: TestClient <client_label> <nresources> [resourceid] [<no_segment_parts> <part_duration>]"
+  val usageMsg =
+    "Usage: ZKTransactionTestClient <client_label> <nresources> [resourceid] [<no_segment_parts> <part_duration>]"
 
   require(args.size > 2, usageMsg)
 

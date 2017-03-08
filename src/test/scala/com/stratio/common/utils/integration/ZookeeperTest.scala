@@ -89,6 +89,47 @@ class ZookeeperIntegrationTest extends WordSpec
       dao.count() shouldBe a[Failure[_]]
     }
   }
+
+  "A Transaction manager backed by Zookeeper" should {
+
+    import com.stratio.common.utils.MultiJVMTestUtils._
+
+    object OutputEntry {
+
+      def apply(line: String): OutputEntry = {
+        //TODO: Be able to extract more than one resource id
+        val ExtractionRegex = """^client=(\w+)\s+resources=\[(\w+)]\s+segment=(\d+)\s+part=(\d+)\s*$""".r
+        line match {
+          case ExtractionRegex(client, resource, segmentStr, partStr) =>
+            OutputEntry(client, Seq(resource), segmentStr.toInt, partStr.toInt)
+        }
+      }
+
+    }
+    case class OutputEntry(client: String, resources: Seq[String], segment: Int, part: Int)
+
+    "avoid exclusion zone process interleaving" in {
+
+      val testBatch = (TestBatch() /: (1 to 5)) { (batchToUpdate, n) =>
+        val p = externalProcess(ZKTransactionTestClient)(s"testclient$n", "1", "a", "5", (200+n).toString)
+        batchToUpdate addProcess p
+      }
+
+      val sequenceGroups = {
+        testBatch.launchAndWait().view.map(OutputEntry(_)).zipWithIndex groupBy {
+          case (OutputEntry(label, List(resource), segment, part), n) => label
+        } values
+      } map (_.map(_._2))
+
+      sequenceGroups foreach { group =>
+        group should contain theSameElementsInOrderAs (group.min until (group.min + group.size))
+      }
+
+    }
+
+
+  }
+
 }
 
 class DummyZookeeperDAOComponent extends GenericDAOComponent[Dummy]

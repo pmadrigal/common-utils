@@ -1,14 +1,24 @@
 
+/*
+ * Copyright (C) 2015 Stratio (http://stratio.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.common.utils
 
-import java.io._
-
-import com.stratio.common.utils.components.transaction_manager.TestClient
-
 import scala.reflect.ClassTag
-import scala.collection.mutable.SynchronizedQueue
 
-object MultiJVMTestUtils extends App {
+object MultiJVMTestUtils {
 
   import scala.sys.process._
 
@@ -23,26 +33,51 @@ object MultiJVMTestUtils extends App {
 
   }
 
+  class TestBatch private (private val batch: Seq[ProcessBuilder] = Seq.empty) {
 
-  /*private val mergedOutputs = new collection.mutable.Queue[String]()
+    def addProcess(process: ProcessBuilder): TestBatch = new TestBatch(process +: batch)
 
-  val pLogger = ProcessLogger { line =>
-    mergedOutputs.synchronized(mergedOutputs.enqueue(line))
+    def launchAndWait(): Seq[String] = {
+
+      val mergedOutputs = new collection.mutable.Queue[String]()
+
+      val pLogger = ProcessLogger { line =>
+        mergedOutputs.synchronized(mergedOutputs.enqueue(line))
+      }
+
+      val toWait = batch.reverse.map { process =>
+        process.run(pLogger)
+      }
+
+      toWait.foreach(_.exitValue())
+
+      mergedOutputs synchronized mergedOutputs
+
+    }
+
   }
 
+  object TestBatch {
+    def apply(): TestBatch = new TestBatch()
+  }
 
-  val p1 = externalProcess(TestClient)("testclient1", "2", "a", "b", "10", "300").run(pLogger)
-  val p2 = externalProcess(TestClient)("testclient2", "2", "c", "d", "10", "200").run(pLogger)
-  val p3 = externalProcess(TestClient)("testclient3", "2", "b", "c", "10", "200").run(pLogger)
-  val p4 = externalProcess(TestClient)("testclient4", "2", "c", "d", "10", "200").run(pLogger)
+  /* USE EXAMPLE:
 
-  p1.exitValue()
-  p2.exitValue()
-  p3.exitValue()
-  p4.exitValue()
+    import com.stratio.common.utils.integration.ZKTransactionTestClient
 
-  mergedOutputs.synchronized {
-    mergedOutputs.foreach(println)
-  }*/
+    val testBatch = TestBatch() addProcess {
+      externalProcess(ZKTransactionTestClient)("testclient1", "3", "a", "b", "c", "10", "300")
+    } addProcess {
+      externalProcess(ZKTransactionTestClient)("testclient2", "2", "c", "d", "10", "200")
+    } addProcess {
+      externalProcess(ZKTransactionTestClient)("testclient3", "2", "b", "c", "10", "200")
+    } addProcess {
+      externalProcess(ZKTransactionTestClient)("testclient4", "2", "c", "d", "10", "200")
+    }
+
+    testBatch.launchAndWait().foreach(x => println(s"> $x"))
+
+  */
+
 
 }
