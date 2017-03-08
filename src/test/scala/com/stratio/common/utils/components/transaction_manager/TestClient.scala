@@ -7,25 +7,27 @@ import com.stratio.common.utils.components.transaction_manager.impl.ZookeeperRep
 
 object TestClient extends App {
 
-  case class Resource(n: Int) extends TransactionResource {
-    val id: String = n.toString
-  }
+  case class Resource(id: String) extends TransactionResource
 
-  require(
-    args.size > 2 && args.size % 2 == 1,
-    "Usage: TestClient <client_label> <resourceids_prefix> <nres> [<no_segment_parts> <part_duration>]"
-  )
+  val usageMsg = "Usage: TestClient <client_label> <nresources> [resourceid] [<no_segment_parts> <part_duration>]"
+
+  require(args.size > 2, usageMsg)
 
   val Array(
     label,
-    resourcePrefix,
-    nResources,
-    segmentsStr @ _*
+    nResourcesStr,
+    remainingArgs @ _*
   ) = args
+
+  require(nResourcesStr.toInt <= remainingArgs.size)
+
+  val (resourcesStr, segmentsStr) = remainingArgs.splitAt(nResourcesStr.toInt)
+  val resources = resourcesStr map Resource
+
+  require((remainingArgs.size - resources.size) % 2 == 0, usageMsg)
 
   val segments = segmentsStr.grouped(2)
 
-  val resources = (0 until nResources.toInt) map Resource
 
   def mayBeProtected(block: => Unit): Unit =
     if(resources.isEmpty) block

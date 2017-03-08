@@ -1,9 +1,12 @@
 
 package com.stratio.common.utils
 
-import java.io.{ByteArrayInputStream, InputStream, OutputStream, PrintStream}
+import java.io._
+
+import com.stratio.common.utils.components.transaction_manager.TestClient
 
 import scala.reflect.ClassTag
+import scala.collection.mutable.SynchronizedQueue
 
 object MultiJVMTestUtils extends App {
 
@@ -16,18 +19,30 @@ object MultiJVMTestUtils extends App {
     val classPath = System.getProperty("java.class.path")
     val className = ct.runtimeClass.getCanonicalName.reverse.dropWhile(_ == '$').reverse
 
-    javaPath :: "-cp" :: classPath :: className :: Nil
+    javaPath :: "-cp" :: classPath :: className :: params.toList
 
   }
 
 
-  val is = new ByteArrayInputStream("hello there!".getBytes("UTF-8"))
+  /*private val mergedOutputs = new collection.mutable.Queue[String]()
 
-  /*val p = (externalProcess(TestApp01)() #< is).run()
-  Thread.sleep(2200)
-  p.destroy()
-  println(p.exitValue())*/
+  val pLogger = ProcessLogger { line =>
+    mergedOutputs.synchronized(mergedOutputs.enqueue(line))
+  }
 
 
+  val p1 = externalProcess(TestClient)("testclient1", "2", "a", "b", "10", "300").run(pLogger)
+  val p2 = externalProcess(TestClient)("testclient2", "2", "c", "d", "10", "200").run(pLogger)
+  val p3 = externalProcess(TestClient)("testclient3", "2", "b", "c", "10", "200").run(pLogger)
+  val p4 = externalProcess(TestClient)("testclient4", "2", "c", "d", "10", "200").run(pLogger)
+
+  p1.exitValue()
+  p2.exitValue()
+  p3.exitValue()
+  p4.exitValue()
+
+  mergedOutputs.synchronized {
+    mergedOutputs.foreach(println)
+  }*/
 
 }
