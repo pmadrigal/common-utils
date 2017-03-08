@@ -3,8 +3,6 @@ package com.stratio.common.utils
 
 import java.io.{ByteArrayInputStream, InputStream, OutputStream, PrintStream}
 
-import com.stratio.common.utils.components.translation_manager.{RunningApp, TestApp01}
-
 import scala.reflect.ClassTag
 
 object MultiJVMTestUtils extends App {
@@ -25,10 +23,10 @@ object MultiJVMTestUtils extends App {
 
   val is = new ByteArrayInputStream("hello there!".getBytes("UTF-8"))
 
-  val p = (externalProcess(TestApp01)() #< is).run()
+  /*val p = (externalProcess(TestApp01)() #< is).run()
   Thread.sleep(2200)
   p.destroy()
-  println(p.exitValue())
+  println(p.exitValue())*/
 
 
 

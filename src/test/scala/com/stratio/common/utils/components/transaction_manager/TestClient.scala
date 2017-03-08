@@ -7,11 +7,14 @@ import com.stratio.common.utils.components.transaction_manager.impl.ZookeeperRep
 
 object TestClient extends App {
 
-  val ZookeeperTestPort: Int = 2181 //10666
-
   case class Resource(n: Int) extends TransactionResource {
     val id: String = n.toString
   }
+
+  require(
+    args.size > 2 && args.size % 2 == 1,
+    "Usage: TestClient <client_label> <resourceids_prefix> <nres> [<no_segment_parts> <part_duration>]"
+  )
 
   val Array(
     label,
@@ -24,14 +27,22 @@ object TestClient extends App {
 
   val resources = (0 until nResources.toInt) map Resource
 
+  def mayBeProtected(block: => Unit): Unit =
+    if(resources.isEmpty) block
+    else transactionManager.repository.atomically("test", resources.head, resources.tail:_*)(block)
+
   val transactionManager = new ZookeeperRepositoryWithTransactionsComponent
     with TypesafeConfigComponent with Slf4jLoggerComponent
 
   segments.zipWithIndex foreach { case (segment, iteration) =>
-    val Seq(millis, nParts) = segment.map(_.toLong)
-    transactionManager.repository.atomically("test", resources.head, resources.tail:_*) {
-      Thread.sleep(millisStr.toLong)
+    val Seq(nParts, millis) = segment.map(_.toLong)
+    mayBeProtected {
+      (1L to nParts) foreach { part =>
+        println(s"client=$label resources=[${resources.map(_.id).mkString(", ")}] segment=$iteration part=$part")
+        Thread.sleep(millis)
+      }
     }
   }
+
 }
 

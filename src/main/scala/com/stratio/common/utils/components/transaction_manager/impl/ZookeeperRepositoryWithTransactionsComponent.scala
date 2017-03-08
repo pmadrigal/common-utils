@@ -72,7 +72,7 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
     }
 
     private def lockPath(entity: String)(resource: TransactionResource): String = {
-      s"$entity/locks/${resource.id}"
+      s"/$entity/locks/${resource.id}"
     }
 
     override def atomically[T](
