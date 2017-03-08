@@ -33,7 +33,10 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
     with TransactionalRepository {
 
     //TODO: Improve path option usage
-    private def acquisitionResource: String = s"${path.getOrElse("")}/locks"
+    private def acquisitionResource: String = path match {
+      case Some(pathValue) => s"/$pathValue/locks"
+      case None => "/locks"
+    }
 
     private object AcquiredLocks {
 
