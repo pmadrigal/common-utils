@@ -11,8 +11,9 @@ Now is possible to create some generic modules:
 - Repositories
 - Logger
 - Configuration
+- Transaction managers
 
-Appart from these modules, a functional package has been added in order to provide some extended functionality
+Apart from these modules, a functional package has been added in order to provide some extended functionality
 regarding scala collections and functional utilities.
 
 Repositories
@@ -291,4 +292,71 @@ To set a monitor and subscribe it to our silly actor heartbeats you can just do 
 `testActor` will receive `HeartbeatLost(fallenId)` when the by-that-id identified service has stopped its heartbeat.
 
 
+Transaction managers
+====================
+
+A public component interface aimed to abstract mutual cluster-wide exclusion code areas over a protected set of 
+resources.
+
+The idea is to apply the principles of JVM's object monitor locks. However its implementors should guarantee that
+these exclusion areas are cluster-wide. That is, this interface should serve as a way of seamlessly provide cluster 
+wide `syncrhonize` operation.
+
+```scala
+transactionMgr.atomically("test", DogsTable) {
+  ...
+  //The code here will won't run at the same time that any other
+  //code protected with the resource DogsTable at any JVM in the same or other machine
+  ...
+}
+```
+
+Protected resources should not be shared, instead, they should serve as unique lock identifiers:
+
+```
+                                  +-------------------+
+                                  |                   |
+                    +-----------> |  Shared Resource  | <-----------------------+
+                    |             |                   |                         |
+                    |             +---------+---------+                         |
+                    |                       |                                   |
++------------------------+                  |                 +----------------------+
+|    Node (A)       |    |                  |                 |    Node (B)     |    |
+|                   |    |                  |                 |                 |    |
+|                   |    |                  v                 |                 |    |
+|                   +    |                                    |                 +    |
+|  atomically(Shared Resorce) {         +--------+            | atomically(Shared Resorce) {
+|                                       |        |            |                      |
+|   //Code @ A, never runs at the       |  id    |            |  //Code @ B, never runs at the
+|   //same time than code @ B           |        |            |  //same time than code @ A
+|                        |              +---+----+            |                      |
+|  }                     |                  |                 | }                    |
+|                        |                  |                 |                      |
+|                        |                  |                 |                      |
+|                        |                  |                 |                      |
+|                        |                  |                 |                      |
++------------------------+                  v                 +----------------------+
+
+                                         XXXXXXX
+                                         X     X
+                                         X     X
+                                      +--X-----X--+
+                                      |    +-+    |
+                                      |    | |    |
+                                      |    | |    |
+                                      |    +-+    |
+                                      +-----------+
+
+                                      Cluster Lock
+
+```
+
+Zookeeper 
+------------------------------------------------
+
+An Zookeeper based implementor is also provided  by `ZookeeperRepositoryWithTransactionsComponent` in the form of a 
+mixed component: Repository + Transaction Manager
+
+A good use example can be found at `ZookeeperIntegrationTest` integration test where several 
+`ZKTransactionTestClient` application processes compete for the same shared resource: A common output stream.
   
