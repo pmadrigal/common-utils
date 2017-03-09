@@ -153,11 +153,7 @@ class ZookeeperIntegrationTest extends WordSpec
       sequenceGroups(outTwoAndThree) foreach { group =>
         group should contain theSameElementsInOrderAs (group.min until (group.min + group.size))
       }
-
-      sequenceGroups(outOneAndThree) foreach { group =>
-        group should not contain theSameElementsInOrderAs (group.min until (group.min + group.size))
-      }
-
+      
     }
 
 
