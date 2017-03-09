@@ -22,8 +22,8 @@ trait TransactionResource {
 
 object TransactionResource {
 
-  object Dao extends TransactionResource {
-    override def id: String = "_dao"
+  object WholeRepository extends TransactionResource {
+    override def id: String = "_all"
   }
 
 }

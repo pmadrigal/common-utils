@@ -17,7 +17,7 @@
 package com.stratio.common.utils.components.transaction_manager
 
 import com.stratio.common.utils.components.repository.RepositoryComponent
-import TransactionResource.Dao
+import TransactionResource.WholeRepository
 
 trait TransactionManagerComponent[K,V] {
 
@@ -25,12 +25,31 @@ trait TransactionManagerComponent[K,V] {
 
   trait TransactionalRepository extends Repository {
 
+    /**
+      * Code execution exclusion zone over a given set of cluster-wide resources.
+      *
+      * @param entity Entity prefix used for the content repository providing synchronization mechanisms
+      * @param firstResource First resource in the protected resource set
+      * @param resources Remaining resources in the protected resource set
+      * @param block Code to execute in the exclusion area over the resources
+      * @tparam T Return type of the exclusion area block
+      * @return Exclusion area result after its executions
+      */
     def atomically[T](entity: String,
       firstResource: TransactionResource,
       resources: TransactionResource*
     )(block: => T): T
 
-    final def atomically[T](entity: String)(block: => T): T = atomically[T](entity, Dao)(block)
+    /**
+      * Code execution exclusion zone over a given repository content. The exlucsion area will be
+      * protected over all the resources managed by the `entity`, that is, the entity itself
+      *
+      * @param entity Entity prefix used for the content repository providing synchronization mechanisms
+      * @param block Code to execute in the exclusion area over the resources
+      * @tparam T Return type of the exclusion area block
+      * @return Exclusion area result after its executions
+      */
+    final def atomically[T](entity: String)(block: => T): T = atomically[T](entity, WholeRepository)(block)
   }
 
 }

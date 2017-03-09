@@ -23,6 +23,25 @@ import com.stratio.common.utils.components.transaction_manager.impl.ZookeeperRep
 
 object ZKTransactionTestClient extends App {
 
+  case class OutputEntry(client: String, resources: Seq[String], segment: Int, part: Int) {
+    override def toString: String =
+      s"client=$client resources=[${resources.mkString(", ")}] segment=$segment part=$part"
+  }
+
+  object OutputEntry {
+
+    def apply(line: String): OutputEntry = {
+      //TODO: Be able to extract more than one resource id
+      val ExtractionRegex =
+        """^client=(\w+)\s+resources=\[\s*((?:\w+)?(?:,\s*\w+\s*)*)\s*]\s+segment=(\d+)\s+part=(\d+)\s*$""".r
+      line match {
+        case ExtractionRegex(client, resources, segmentStr, partStr) =>
+          OutputEntry(client, resources.split(",").map(_.trim), segmentStr.toInt, partStr.toInt)
+      }
+    }
+
+  }
+
   case class Resource(id: String) extends TransactionResource
 
   val usageMsg =
@@ -57,7 +76,7 @@ object ZKTransactionTestClient extends App {
     val Seq(nParts, millis) = segment.map(_.toLong)
     mayBeProtected {
       (1L to nParts) foreach { part =>
-        println(s"client=$label resources=[${resources.map(_.id).mkString(", ")}] segment=$iteration part=$part")
+        println(OutputEntry(label, resources.map(_.id), iteration, part.toInt))
         Thread.sleep(millis)
       }
     }
