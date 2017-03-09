@@ -38,7 +38,7 @@ trait ZookeeperRepositoryComponent extends RepositoryComponent[String, Array[Byt
 
   val repository = new ZookeeperRepository()
 
-  class ZookeeperRepository(path: Option[String] = None) extends Repository {
+  class ZookeeperRepository extends Repository {
 
     protected def curatorClient: CuratorFramework =
       ZookeeperRepository.getInstance(getZookeeperConfig)
@@ -221,6 +221,8 @@ object ZookeeperRepositoryComponent {
   val ZookeeperRetryInterval = "retryInterval"
   val DefaultZookeeperRetryInterval = 10000
   val ConfigZookeeper = "zookeeper"
+  val ZookeeperLockBasePath = "baseLockPath"
+  val DefaultZookeeperLockBasePath = "/stratio"
 }
 
 case class ZookeeperRepositoryException(msg: String) extends Exception(msg)

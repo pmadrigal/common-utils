@@ -27,14 +27,17 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
 
   self: ConfigComponent with LoggerComponent =>
 
-  override val repository: ZookeeperRepositoryWithTransactions = new ZookeeperRepositoryWithTransactions(None)
+  override val repository: ZookeeperRepositoryWithTransactions = new ZookeeperRepositoryWithTransactions
 
   //TODO Improve paths and locksPath behaviour
-  class ZookeeperRepositoryWithTransactions(path: Option[String] = None) extends ZookeeperRepository(path)
+  class ZookeeperRepositoryWithTransactions(path: Option[String] = None) extends ZookeeperRepository
     with TransactionalRepository {
 
+    import com.stratio.common.utils.components.repository.impl.ZookeeperRepositoryComponent._
+    private val baseLockPath = config.getString(ZookeeperLockBasePath).getOrElse(DefaultZookeeperLockBasePath)
+
     //TODO: Improve path option usage
-    private def acquisitionResource: String = "/locks" + path.map("/" + _).getOrElse("")
+    private def acquisitionResource: String = baseLockPath + path.map("/" + _).getOrElse("") + "/locks"
 
     private object AcquiredLocks {
 
@@ -72,16 +75,13 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
 
     }
 
-    private def lockPath(entity: String)(resource: TransactionResource): String = {
-      s"/locks/$entity/${resource.id}"
-    }
+    private def lockPath(resource: TransactionResource): String = s"/$baseLockPath/locks${resource.id}"
 
     override def atomically[T](
-                                entity: String,
                                 firstResource: TransactionResource,
                                 resources: TransactionResource*)(block: => T): T = {
 
-      val paths = (firstResource +: resources).map(lockPath(entity))
+      val paths = (firstResource +: resources).map(lockPath)
       AcquiredLocks.acquireResources(paths)
       val res = try {
         block
