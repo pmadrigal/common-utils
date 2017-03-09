@@ -29,11 +29,12 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
 
   override val repository: ZookeeperRepositoryWithTransactions = new ZookeeperRepositoryWithTransactions(None)
 
+  //TODO Improve paths and locksPath behaviour
   class ZookeeperRepositoryWithTransactions(path: Option[String] = None) extends ZookeeperRepository(path)
     with TransactionalRepository {
 
     //TODO: Improve path option usage
-    private def acquisitionResource: String = "/" + path.map(_ + "/").getOrElse("") + "locks"
+    private def acquisitionResource: String = "/locks" + path.map("/" + _).getOrElse("")
 
     private object AcquiredLocks {
 
@@ -72,7 +73,7 @@ trait ZookeeperRepositoryWithTransactionsComponent extends ZookeeperRepositoryCo
     }
 
     private def lockPath(entity: String)(resource: TransactionResource): String = {
-      s"/$entity/locks/${resource.id}"
+      s"/locks/$entity/${resource.id}"
     }
 
     override def atomically[T](
